@@ -1,0 +1,28 @@
+First Person Shooter
+1015
+	Vector : 크기와 방향을 가진 데이터
+		3D 공간상 오브젝트의 위치, 이동속도를 나타냄
+	Scalar : 하나의 값으로 이뤄진 데이터(크기)
+	Quaternion
+		오브젝트의 회전을 처리하기 위한 데이터
+		x, y, z, w로 구성
+		*유니티에서는 Euler가 있어서 x, y, z로 이용 가능
+	좌표축
+		양의 방향: x - right, y - up, z - forward
+		로컬 좌표 vs 월드 좌표
+	스케일 상 1Unit ≒ 1m
+	렌더링 : 화면에 3D 모델 데이터를 그래픽으로 그려주는 것
+		Universal Render Pipeline
+			PC, 콘솔, 모바일에서 좀 더 빠르고 개발자가 수정하기 쉬운 렌더링 방식
+1016
+	Rendering Pipeline
+		3D 오브젝트 => 화면 까지의 과정
+			정점 버퍼에 정점 정보 넣기
+			조명 및 텍스쳐 정보 세팅
+			쉐이더 정보 등 세팅
+			월드 공간 > 카메라 뷰 공간 > 화면 공간 > 렌더링
+	Built-in Rendering Pipeline
+	Scriptable Render Pipeline
+		Light Weight Render Pipeline
+			=> Universal Render Pipeline
+		High Definition Render Pipeline
