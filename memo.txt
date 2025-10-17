@@ -26,3 +26,5 @@ First Person Shooter
 		Light Weight Render Pipeline
 			=> Universal Render Pipeline
 		High Definition Render Pipeline
+1017
+	1인칭 시점 이동, 카메라 회전
