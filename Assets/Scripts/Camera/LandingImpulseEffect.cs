@@ -1,26 +1,26 @@
 using System;
 using UnityEngine;
 
-//skrgkthrehfmf AnimationCurvefh 'cndrur rkdeh'dp aovldgo ckrwl dlavjftmfmf ej tlrkr clsghkwjrdmfh
+// 착지 가속도를 AnimationCurve로 매핑해 '충격 강도'를 계산하고, 그에 따른 흔들림 효과를 적용하는 스크립트
 public class LandingImpulseEffect : MonoBehaviour, ICameraEffect
 {
     [Header("Refs")]
-    [SerializeField] private LocomotionFeed _feed;//wjqwl, tnwlrthreh
+    [SerializeField] private LocomotionFeed _feed; // 이동, 속도 정보
 
     [Header("Mapping")]
-    public float MaxConsideredFallSpeed = 12f;  //wjdrbghk tkdgks
-    public AnimationCurve StrengthByFall        //skrgkthreh(0~1) => rkdeh(0~1)
-        = AnimationCurve.EaseInOut(0f, 0.6f, 1f, 1.0f);//wjskrgkdptjeh whsworka dlTehfhr
+    public float MaxConsideredFallSpeed = 12f;  // 고려할 최대 낙하 속도
+    public AnimationCurve StrengthByFall        // 착지 속도(0~1) → 강도(0~1)
+        = AnimationCurve.EaseInOut(0f, 0.6f, 1f, 1.0f); // 낮은 착지 속도일수록 완만한 강도 곡선
 
     [Header("Impulse")]
-    public float AmplitudeScale = 0.14f;//chleo rkdehtl Y wlsvhr(m)
-    public float Damping = 10f;//rkathl rPtn
-    public float OscillationHz=6.5f;//wkswlsehd qlseh
-    public float TiltDegrees = 3.5f;//vlcl tnrdla
-    
-    private bool wasGrounded;//wjs vmfpdla wjqwl tkdxo
-    private float timeSinceImpact;//dlavjftm rudrhk tlrks
-    private float impactStrength;//0~1 rkdeh
+    public float AmplitudeScale = 0.14f;  // 최대 강도의 Y 진폭(m)
+    public float Damping = 10f;           // 감쇠율 계수
+    public float OscillationHz = 6.5f;    // 진동 주파수(Hz)
+    public float TiltDegrees = 3.5f;      // 회전 기울기 각도
+
+    private bool wasGrounded;       // 이전 프레임에서 지면에 닿아 있었는가
+    private float timeSinceImpact;  // 착지 후 경과 시간
+    private float impactStrength;   // 0~1 강도 값
 
     private Vector3 _posOffset;
     private Vector3 _rotOffset;
@@ -31,18 +31,18 @@ public class LandingImpulseEffect : MonoBehaviour, ICameraEffect
 
     void Update()
     {
-        if(_feed == null)
+        if (_feed == null)
         {
             return;
         }
 
         bool grounded = _feed.IsGrounded;
 
-        if(grounded && !wasGrounded)
-        {//rkt ckrwlgka
-            float vyAbs = Mathf.Abs(_feed.VerticalVelocity);//ckrwl wlrwjs |Vy|
-            float tNorm = Mathf.Clamp01(vyAbs / MaxConsideredFallSpeed);//0~1 wjdrbghk
-            float mapped = StrengthByFall.Evaluate(tNorm);//rhrtjs aovld rkdeh
+        if (grounded && !wasGrounded)
+        { // 착지 순간
+            float vyAbs = Mathf.Abs(_feed.VerticalVelocity);     // 착지 속도 |Vy|
+            float tNorm = Mathf.Clamp01(vyAbs / MaxConsideredFallSpeed); // 0~1 정규화된 속도
+            float mapped = StrengthByFall.Evaluate(tNorm);       // 곡선을 통한 강도 계산
             impactStrength = mapped;
             timeSinceImpact = 0f;
         }
@@ -52,8 +52,8 @@ public class LandingImpulseEffect : MonoBehaviour, ICameraEffect
         float dt = Time.deltaTime;
         timeSinceImpact += dt;
 
-        float A = AmplitudeScale * impactStrength;//wlsvhr
-        float decay = Mathf.Exp(-Damping * timeSinceImpact);//rkathl
+        float A = AmplitudeScale * impactStrength;                  // 진폭 계산
+        float decay = Mathf.Exp(-Damping * timeSinceImpact);        // 감쇠 계산
         float y = A * decay * (1f - Mathf.Cos(2f * Mathf.PI * OscillationHz * timeSinceImpact));
 
         _posOffset = new Vector3(0f, -y, 0f);

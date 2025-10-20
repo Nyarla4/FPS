@@ -16,32 +16,30 @@ public class LocomotionFeed : MonoBehaviour
 
     public Vector3 PlayerRight { get { return transform.right; } }
     public Vector3 PlayerForward { get { return transform.forward; } }
-    //public Vector3 PlayerForward => transform.forward; 
+    // public Vector3 PlayerForward => transform.forward;
 
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
-        if(_controller == null)
+        if (_controller == null)
         {
             Debug.LogError("[LocomotionFeed] 캐릭터 컨트롤러 누락");
         }
 
-        if(GroundCheck == null)
+        if (GroundCheck == null)
         {
-            if (GroundCheck == null)
-            {
-                GameObject go = new GameObject("GroundCheck");
-                go.transform.SetParent(transform);
-                go.transform.localPosition = Vector3.up * 0.1f;
-                GroundCheck = go.transform;
-            }
+            // GroundCheck가 없을 경우 자동 생성
+            GameObject go = new GameObject("GroundCheck");
+            go.transform.SetParent(transform);
+            go.transform.localPosition = Vector3.up * 0.1f;
+            GroundCheck = go.transform;
         }
     }
 
     void Update()
     {
-        Vector3 vel = _controller.velocity;//curSpeed from cc
-        Vector3 horizontal = vel;//tempVector only horizontal
+        Vector3 vel = _controller.velocity; // 캐릭터 컨트롤러의 현재 속도
+        Vector3 horizontal = vel;           // 수평 속도만 계산용
         horizontal.y = 0f;
 
         HorizontalVelocity = horizontal;
