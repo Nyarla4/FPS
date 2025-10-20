@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpBufferTime = 0.12f;//점프키 선입력 허용시간
     [SerializeField] private LayerMask _groundMask;//지면 레이어
     [SerializeField] private float _groundCheckRadius = 0.3f;//지면 감지 범위
-    [SerializeField] private Transform _groundCheck;
+    //[SerializeField] private Transform _groundCheck;
 
     [Header("ref")]//참조
     [SerializeField] private Transform _cameraPivot;
@@ -28,20 +28,23 @@ public class PlayerController : MonoBehaviour
     private float _currentSpeed;
     private Vector3 _velocity;
 
-    public bool IsGround;
+    public bool IsGround => _feed.IsGrounded;
     private float _lastGroundedTime;//마지막 착지시각
     private float _lastJumpPressTime;//마지막 점프입력시각
 
+    private LocomotionFeed _feed;
     private void Awake()
     {
-        if (_groundCheck == null)
-        {
-            GameObject go = new GameObject("GroundCheck");
-            go.transform.SetParent(transform);
-            go.transform.localPosition = Vector3.up * 0.1f;
-            _groundCheck = go.transform;
-        }
         _controller = GetComponent<CharacterController>();
+        if (_controller == null)
+        {
+            Debug.LogError("[PlayerController] 캐릭터 컨트롤러 누락");
+        }
+
+        if (_feed == null)
+        {
+            _feed = GetComponent<LocomotionFeed>();
+        }
     }
 
     void Start()
@@ -93,34 +96,44 @@ public class PlayerController : MonoBehaviour
 
     public void UpdateGround()
     {
-        bool hit = false;
+        //bool hit = false;
 
-        if (_groundCheck != null)
+        //if (_groundCheck != null)
+        //{
+        //    Collider[] hits = Physics.OverlapSphere(_groundCheck.position, _groundCheckRadius, _groundMask, QueryTriggerInteraction.Ignore);
+        //    if (hits != null && hits.Length > 0)
+        //    {
+        //        hit = true;
+        //    }
+        //}
+
+        //if (hit)
+        //{
+        //    if (!IsGround)
+        //    {
+        //        if (_velocity.y < 0.0f)
+        //        {//떨어지는 중
+        //            _velocity.y = -2.0f;
+        //        }
+        //    }
+        //
+        //    IsGround = true;
+        //    _lastGroundedTime = Time.time;
+        //}
+        //else
+        //{
+        //    IsGround = false;
+        //}
+
+        if (!IsGround)
         {
-            Collider[] hits = Physics.OverlapSphere(_groundCheck.position, _groundCheckRadius, _groundMask, QueryTriggerInteraction.Ignore);
-            if (hits != null && hits.Length > 0)
-            {
-                hit = true;
+            if (_velocity.y < 0.0f)
+            {//떨어지는 중
+                _velocity.y = -2.0f;
             }
         }
 
-        if (hit)
-        {
-            if (!IsGround)
-            {
-                if (_velocity.y < 0.0f)
-                {//떨어지는 중
-                    _velocity.y = -2.0f;
-                }
-            }
-
-            IsGround = true;
-            _lastGroundedTime = Time.time;
-        }
-        else
-        {
-            IsGround = false;
-        }
+        _lastGroundedTime = Time.time;
     }
 
     private void UpdateHorizontalSpeed(float dt)
@@ -145,7 +158,7 @@ public class PlayerController : MonoBehaviour
         //점프 키 눌림 여부
         bool buffered = (Time.time - _lastJumpPressTime) <= _jumpBufferTime;
 
-        if(buffered && (IsGround || coyote))
+        if (buffered && (IsGround || coyote))
         {
             _velocity.y = Mathf.Sqrt(Mathf.Abs(2.0f * _gravity * _jumpHeight));
             _lastJumpPressTime = -999.0f;
