@@ -16,12 +16,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _coyoteTime = 0.12f;//체공 시간
     [SerializeField] private float _jumpBufferTime = 0.12f;//점프키 선입력 허용시간
     [SerializeField] private LayerMask _groundMask;//지면 레이어
-    [SerializeField] private float _groundCheckRadius = 0.3f;//지면 감지 범위
+    //[SerializeField] private float _groundCheckRadius = 0.3f;//지면 감지 범위
     //[SerializeField] private Transform _groundCheck;
 
     [Header("ref")]//참조
     [SerializeField] private Transform _cameraPivot;
     private CharacterController _controller;
+
+    public GroundingStablillizer Stablillizer;
 
     private Vector2 _moveInput;
     private bool _sprintHeld;//질주 버튼 눌렸는지 여부
@@ -47,11 +49,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-
-    }
-
     void Update()
     {
         float dt = Time.deltaTime;
@@ -60,7 +57,23 @@ public class PlayerController : MonoBehaviour
         ApplyGravityAndJump(dt);
 
         Vector3 move = CalculateWorldMove();
+
+        //rudtksk rPeksdptj qhwjd cjfl
+        if (Stablillizer != null)
+        {
+            move = Stablillizer.ProjectOnGround(move, _controller, this);
+            move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
+        }
+
         _controller.Move(move * dt);
+
+        if (Stablillizer != null)
+        {
+            if (_controller.velocity.y <= 0.0f)
+            {//Ejfdjwlrh dlTsms tkdghkddls ruddn
+                Stablillizer.TrySnapDown(_controller, this);
+            }
+        }
     }
 
     #region InputAction
@@ -138,7 +151,17 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateHorizontalSpeed(float dt)
     {
-        float targetSpeed = _sprintHeld ? _sprintSpeed : _walkSpeed;
+        //qusrudwja 1: dlqfur zmrldp Ekfk 'ahrvy threh'fmf 0~chleoRkwl tjfwjd
+        //  -dkskffhrm dlqfurdlf Eo 'dlehddl sjan wkrek'sms cprka rotjs
+        float inputMag = _moveInput.magnitude;//0~1
+
+        float baseTarget = _walkSpeed;
+        if (_sprintHeld)
+        {
+            baseTarget = _sprintSpeed;
+        }
+
+        float targetSpeed = baseTarget * inputMag;//dlqfur zmrl qksdud
 
         if (_currentSpeed < targetSpeed)
         {
@@ -169,6 +192,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 CalculateWorldMove()
     {
+        //qusrudwja 2: zkapfk vudaus xnduddl 'sjan wkrdmaus' vmffpdldj wjsqkd/dncmrdmfh vhfqor
         Vector3 forward = Vector3.forward;
         Vector3 right = Vector3.right;
 
@@ -180,27 +204,59 @@ public class PlayerController : MonoBehaviour
             camForward.y = 0.0f;
             camRight.y = 0.0f;
 
-            if (camForward.sqrMagnitude > 0.0f)
+            float lenF = camForward.magnitude;
+            float lenR = camRight.magnitude;
+
+            if (lenF > 0.0001f)
             {
-                camForward.Normalize();
+                camForward /= lenF;
+            }
+            if (lenR > 0.0001f)
+            {
+                camRight /= lenR;
             }
 
-            if (camRight.sqrMagnitude > 0.0f)
+            //dlarPcl dlgk(rjdml tnwlr tldi emd)aus dkswjs vhfqor
+            if (camForward.sqrMagnitude < 0.0001f || camRight.sqrMagnitude < 0.0001f)
             {
-                camRight.Normalize();
-            }
+                Vector3 bodyF = transform.forward;
+                Vector3 bodyR = transform.right;
 
-            forward = camForward;
-            right = camRight;
+                bodyF.y = 0.0f;
+                bodyR.y = 0.0f;
+
+                if (bodyF.sqrMagnitude > 0.0f)
+                {
+                    bodyF.Normalize();
+                }
+                if (bodyR.sqrMagnitude > 0.0f)
+                {
+                    bodyR.Normalize();
+                }
+
+                forward = bodyF;
+                right = bodyR;
+            }
+            else
+            {
+                forward = camForward;
+                right = camRight;
+            }
         }
 
+        //gmlakd qkdgid
         Vector3 wish = forward * _moveInput.y + right * _moveInput.x;
+
+        //wjdrbghk
         if (wish.sqrMagnitude > 1.0f)
         {
             wish.Normalize();
         }
 
+        //tnvud threh qprxj = qkdgid × guswo threh
         Vector3 horizontal = wish * _currentSpeed;
+
+        //chlwhd dlehd threh(m/s)
         Vector3 move = new Vector3(horizontal.x, _velocity.y, horizontal.z);
         return move;
     }
