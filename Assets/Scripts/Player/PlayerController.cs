@@ -59,8 +59,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = CalculateWorldMove();
 
-        //rudtk dhffkrkf tn dlTdmf Eo Rkwl dlatl wntjr cjfl
-        ////rudtksk rPeksdptj qhwjd cjfl
+        //경사 올라갈 수 있을 때 까지 임시 주석 처리
+        ////경사나 계단에서 보정 처리
         //if (Stablillizer != null)
         //{
         //    move = Stablillizer.ProjectOnGround(move, _controller, this);
@@ -153,8 +153,8 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateHorizontalSpeed(float dt)
     {
-        //qusrudwja 1: dlqfur zmrldp Ekfk 'ahrvy threh'fmf 0~chleoRkwl tjfwjd
-        //  -dkskffhrm dlqfurdlf Eo 'dlehddl sjan wkrek'sms cprka rotjs
+        //변경점 1: 입력 크기에 따라 '목표 속도'를 0~최대까지 설정
+        //  -아날로그 입력일 때 '이동이 너무 작다'는 체감 개선
         float inputMag = _moveInput.magnitude;//0~1
 
         float baseTarget = _walkSpeed;
@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
             baseTarget = _sprintSpeed;
         }
 
-        float targetSpeed = baseTarget * inputMag;//dlqfur zmrl qksdud
+        float targetSpeed = baseTarget * inputMag;//입력 크기 반영
 
         if (_currentSpeed < targetSpeed)
         {
@@ -194,7 +194,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 CalculateWorldMove()
     {
-        //qusrudwja 2: zkapfk vudaus xnduddl 'sjan wkrdmaus' vmffpdldj wjsqkd/dncmrdmfh vhfqor
+        //변경점 2: 카메라 평면 투영이 '너무 작으면' 플레이어 전방/우측으로 폴백
         Vector3 forward = Vector3.forward;
         Vector3 right = Vector3.right;
 
@@ -218,7 +218,7 @@ public class PlayerController : MonoBehaviour
                 camRight /= lenR;
             }
 
-            //dlarPcl dlgk(rjdml tnwlr tldi emd)aus dkswjs vhfqor
+            //임계치 이하(거의 수직 시야 등)면 안전 폴백
             if (camForward.sqrMagnitude < 0.0001f || camRight.sqrMagnitude < 0.0001f)
             {
                 Vector3 bodyF = transform.forward;
@@ -246,19 +246,19 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        //gmlakd qkdgid
+        //희망 방향
         Vector3 wish = forward * _moveInput.y + right * _moveInput.x;
 
-        //wjdrbghk
+        //정규화
         if (wish.sqrMagnitude > 1.0f)
         {
             wish.Normalize();
         }
 
-        //tnvud threh qprxj = qkdgid × guswo threh
+        //수평 속도 벡터 = 방향 × 현재 속도
         Vector3 horizontal = wish * _currentSpeed;
 
-        //chlwhd dlehd threh(m/s)
+        //최종 이동 속도(m/s)
         Vector3 move = new Vector3(horizontal.x, _velocity.y, horizontal.z);
         return move;
     }

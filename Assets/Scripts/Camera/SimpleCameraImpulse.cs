@@ -1,28 +1,28 @@
 using UnityEngine;
 
 /// <summary>
-/// rjfdmadmf elelrjsk gkfEo zkapfk vlqht gmsemsms tmzmflqxm
-/// tmxpq dlqpsxm emd tnsrks dlavjftmdp qksdmdgo zkapfk vlqhtdmf Wkfqrp gmsemsek
-/// *tlspajtls djqtdl rkseksgl tkdyd (ajfql qkdwl: wlsvhr/tlrksdmf Wfkqrp dbwl)
+/// 카메라에 임펄스를 줘서 진동 효과를 주는 컴포넌트
+/// 특정 이벤트에 의해 트리거 되어 일시적으로 진동 효과를 발생시킴
+/// *예: 폭발이나 충돌 등의 이벤트 발생 시 카메라 진동 효과 연출
 /// </summary>
 [DisallowMultipleComponent]
 public class SimpleCameraImpulse : MonoBehaviour
 {
-    public Transform Target;//gmsemf eotkd(zkapfk vlqht)
-    public float PositionAmplitude = 0.02f;//chleo dnlcl dhvmtpt(m)
-    public float RotationAmplitude = 0.6f;//chleo ghlwjs dhvmtpt(��)
-    public float Duration = 0.08f;//dlavjftm wlthrtlrks(ch)
+    public Transform Target; // 카메라 대상(진동 효과)
+    public float PositionAmplitude = 0.02f; // 최대 위치 오프셋(m)
+    public float RotationAmplitude = 0.6f; // 최대 회전 오프셋(도)
+    public float Duration = 0.08f; // 진동 지속시간(초)
 
-    private float _timeLeft = 0.0f;//skadms tlrks
-    private Vector3 _baseLocalPos;//tlwkr fhzjfdnlcl qordjq
-    private Quaternion _baseLocalRot;//tlwkr fhzjfghlwjs qordjq
-    private bool _initialized = false;//chrlghk duqn
+    private float _timeLeft = 0.0f; // 남은 시간
+    private Vector3 _baseLocalPos; // 기본 로컬 위치 저장
+    private Quaternion _baseLocalRot; // 기본 로컬 회전 저장
+    private bool _initialized = false; // 초기화 여부
 
     private void Awake()
     {
         if (Target == null)
         {
-            Target = transform;//tmtmfh vlqhtgkf tneh dlTdma
+            Target = transform; // 자기 자신을 대상으로 설정
         }
     }
 
@@ -43,19 +43,20 @@ public class SimpleCameraImpulse : MonoBehaviour
             return;
         }
 
-        //tlrksdl skadms ruddn rkathlgkau gmsema cjfl
+        // 진동의 남은 시간 동안 랜덤 오프셋 적용
         if (_timeLeft > 0.0f)
         {
-            float t = _timeLeft / Duration;//1->0
+            float t = _timeLeft / Duration; // 1 → 0
             float falloff = Mathf.SmoothStep(0.0f, 1.0f, t);
 
-            //skstn rlqks gmsemffla cjfl(vmfpdlaakek ekffkwlehfhr)
+            // 위치 랜덤 오프셋 생성(프레임마다 갱신)
             Vector3 posJitter = new Vector3(
                 Random.Range(-PositionAmplitude, PositionAmplitude),
                 Random.Range(-PositionAmplitude, PositionAmplitude),
                 Random.Range(-PositionAmplitude, PositionAmplitude)
                 ) * falloff;
 
+            // 회전 랜덤 오프셋 생성(프레임마다 갱신)
             Vector3 rotJitter = new Vector3(
                 Random.Range(-RotationAmplitude, RotationAmplitude),
                 Random.Range(-RotationAmplitude, RotationAmplitude),
@@ -67,19 +68,19 @@ public class SimpleCameraImpulse : MonoBehaviour
 
             _timeLeft -= Time.deltaTime;
             if (_timeLeft <= 0.0f)
-            {//whdfytl dnjstkd qhrrn
+            { // 종료 시 원래 상태 복원
                 Target.localPosition = _baseLocalPos;
-                Target.localRotation = _baseLocalRot ;
+                Target.localRotation = _baseLocalRot;
             }
         }
     }
 
     /// <summary>
-    /// dhlqn ghcnf, dlavjftm 1ghl xmflrj
+    /// 외부 호출 시, 진동 효과 1회 실행
     /// </summary>
     public void Pulse()
     {
-        //chrlghkrk ehls tkdxodptjaks
+        // 초기화된 상태일 경우 실행
         if (_initialized)
         {
             _timeLeft = Duration;

@@ -1,17 +1,17 @@
 using UnityEngine;
 
 /// <summary>
-/// qkf aldmfh fpdlzotmxm tngod, elels vyausdml wkclq/whkvy/qjqtjs wprhd
+/// 발 밑의 표면을 탐지, 해당 표면의 종류/위치/법선을 반환
 /// </summary>
 [DisallowMultipleComponent]
 public class FootstepSurfaceDetector : MonoBehaviour
 {
-    [SerializeField] private Transform _proberOrigin; //fpdl tlwkrwja(zoflrxj zjsxmfhffj wndtla dirrks dnl)
-    [SerializeField] private float _probeDistance = 1.2f;//dkfofh Thf rjfl(vmffpdldj zlsk CC shvdldp akwcnj whwjd)
-    [SerializeField] private LayerMask _groundMask;//qkekr fpdldj
+    [SerializeField] private Transform _proberOrigin; //표면 탐지용(보통 캐릭터 발밑에 위치한 트랜스폼)
+    [SerializeField] private float _probeDistance = 1.2f;//레이 길이 (기본적으로 지면 체크 용도)
+    [SerializeField] private LayerMask _groundMask;//표면 레이어
 
     /// <summary>
-    /// guswo qkfalx vyaus wjdqh ghlremr
+    /// 현재 발밑 표면 정보를 가져옴
     /// </summary>
     public bool TryGetSurface(out SurfaceType surface, out Vector3 point, out Vector3 normal)
     {
@@ -26,12 +26,12 @@ public class FootstepSurfaceDetector : MonoBehaviour
 
         RaycastHit hit;
         bool got = Physics.Raycast(
-            _proberOrigin.position,        //tlwkrwja
-            Vector3.down,                  //dkfoqkdgid
-            out hit,                       //rufrhk
-            _probeDistance,                //rjfl
-            _groundMask,                   //qkekr
-            QueryTriggerInteraction.Ignore //xmflrj antl
+            _proberOrigin.position,        //탐지원
+            Vector3.down,                  //레이방향
+            out hit,                       //결과값
+            _probeDistance,                //길이
+            _groundMask,                   //표면
+            QueryTriggerInteraction.Ignore //트리거 무시
             );
 
         if (got)
@@ -47,7 +47,7 @@ public class FootstepSurfaceDetector : MonoBehaviour
             }
             else
             {
-                //djqtdmaus rlqhsrkqt
+                //컴포넌트가 없을때
                 surface = SurfaceType.Concrete;
                 return true;
             }

@@ -9,10 +9,10 @@ public enum SurfaceType
     Water = 4
 }
 /// <summary>
-/// qkekr/qur emd zhffkdlejrk qnxdms dhqmwprxmdp qnckr, vyausdl djEJswowlfdlsrkfmf shcnfgksms xorm zjavhsjsxm
+/// 표면/재질 및 이펙트와 관련된 처리를 담당하는 컴포넌트
 /// </summary>
 [DisallowMultipleComponent]
 public class SurfaceMaterial : MonoBehaviour
 {
-    public SurfaceType surfaceType = SurfaceType.Concrete;//dhqmrpxmdml vysus xkdlq
+    public SurfaceType surfaceType = SurfaceType.Concrete;//표면재질의 기본 값
 }
