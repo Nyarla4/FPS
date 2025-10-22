@@ -28,3 +28,7 @@ First Person Shooter
 		High Definition Render Pipeline
 1017
 	1인칭 시점 이동, 카메라 회전
+1022
+	지면 종류에 따라 타입 지정 및 콜라이더 배치
+	+발 밑 레이캐스트로 종류 구분
+	=종류에 맞는 사운드, 이펙트 출력 + 카메라 흔들림 세팅

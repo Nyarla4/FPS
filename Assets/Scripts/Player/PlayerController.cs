@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _moveInput;
     private bool _sprintHeld;//질주 버튼 눌렸는지 여부
+    public bool SprintHeld => _sprintHeld;
     private float _currentSpeed;
     private Vector3 _velocity;
 
@@ -58,12 +59,13 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = CalculateWorldMove();
 
-        //rudtksk rPeksdptj qhwjd cjfl
-        if (Stablillizer != null)
-        {
-            move = Stablillizer.ProjectOnGround(move, _controller, this);
-            move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
-        }
+        //rudtk dhffkrkf tn dlTdmf Eo Rkwl dlatl wntjr cjfl
+        ////rudtksk rPeksdptj qhwjd cjfl
+        //if (Stablillizer != null)
+        //{
+        //    move = Stablillizer.ProjectOnGround(move, _controller, this);
+        //    move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
+        //}
 
         _controller.Move(move * dt);
 
