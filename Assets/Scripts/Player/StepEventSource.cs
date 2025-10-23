@@ -90,4 +90,32 @@ public class StepEventSource : MonoBehaviour
             stepsHz = SprintStepsPerSecond;
         }
 
-        //다음 발자국
+        //다음 발자국 타이밍 초기화(최초 1회 설정)
+        if (_nextStepTime <= 0.0f)
+        {
+            _nextStepTime = now + (1.0f / stepsHz);
+        }
+
+        //지면 또는 짧은 접지시간 내에서는 발자국 발생
+        bool canStep = grounded || ((now - _lastGroundedTime) <= GroundedGraceTime);
+
+        if (canStep)
+        {
+            if (now >= _nextStepTime)
+            {
+                if (_leftNext)
+                {
+                    OnStepLeft?.Invoke();
+                    _leftNext = false;
+                }
+                else
+                {
+                    OnStepRight?.Invoke();
+                    _leftNext = true;
+                }
+
+                _nextStepTime = now + (1.0f / stepsHz);
+            }
+        }
+    }
+}
