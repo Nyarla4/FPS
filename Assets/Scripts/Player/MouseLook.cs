@@ -16,6 +16,8 @@ public class MouseLook : MonoBehaviour
     private float _yaw;
     private float _pitch;
 
+    public float SensitivityMultiplier = 1.0f;
+
     private void Awake()
     {
         if (_playerBody == null)
@@ -37,8 +39,8 @@ public class MouseLook : MonoBehaviour
         float dt = Time.deltaTime;
 
         // Look 입력 반영(프레임 독립 보정)
-        float dx = _lookInput.x * _mouseSensitivity * 10f * dt;
-        float dy = _lookInput.y * _mouseSensitivity * 10f * dt;
+        float dx = _lookInput.x * _mouseSensitivity * 10f * dt * SensitivityMultiplier;//좌우
+        float dy = _lookInput.y * _mouseSensitivity * 10f * dt * SensitivityMultiplier;//상하
 
         _yaw += dx;
         _pitch -= dy;
@@ -46,6 +48,7 @@ public class MouseLook : MonoBehaviour
         // Pitch 클램프
         _pitch = Mathf.Clamp(_pitch, _pitchMin, _pitchMax);
 
+        //적용
         if (_playerBody != null)
         {
             Quaternion yRot = Quaternion.Euler(0f, _yaw, 0f);
@@ -65,5 +68,14 @@ public class MouseLook : MonoBehaviour
         {
             _lookInput = ctx.ReadValue<Vector2>();
         }
+    }
+
+    public void SetSensitivityMultiplier(float adsMouseScale)
+    {
+        //너무 작으면 입력이 멈춘것으로 느껴짐
+        //너무 크면 급회전 유발
+        float requested = Mathf.Clamp(adsMouseScale, 0.01f, 5.0f);
+
+        SensitivityMultiplier = requested;
     }
 }

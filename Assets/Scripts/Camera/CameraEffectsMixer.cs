@@ -1,5 +1,4 @@
-using Unity.VisualScripting;
-using UnityEditor.UIElements;
+using System;
 using UnityEngine;
 
 public interface ICameraEffect
@@ -26,6 +25,8 @@ public class CameraEffectsMixer : MonoBehaviour
     private float _baseFov;                  // 기본 FOV
 
     private ICameraEffect[] _effects; // 적용할 이펙트 목록
+
+    private bool _setFOV = true;
 
     private void Awake()
     {
@@ -93,9 +94,14 @@ public class CameraEffectsMixer : MonoBehaviour
         Quaternion rotOffQuat = Quaternion.Euler(rotEulerOffest); // 오일러 -> 쿼터니언 변환
         transform.localRotation = _baseLocalRotation * rotOffQuat;
 
-        if (TargetCamera != null)
+        if (TargetCamera != null && _setFOV)
         {
             TargetCamera.fieldOfView = _baseFov + fovOffset;
         }
+    }
+
+    public void SetFOV(bool value)
+    {
+        _setFOV = value;
     }
 }

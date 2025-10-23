@@ -59,13 +59,13 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = CalculateWorldMove();
 
-        //경사 올라갈 수 있을 때 까지 임시 주석 처리
-        ////경사나 계단에서 보정 처리
-        //if (Stablillizer != null)
-        //{
-        //    move = Stablillizer.ProjectOnGround(move, _controller, this);
-        //    move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
-        //}
+        //경사나 계단에서 보정 처리
+        if (Stablillizer != null)
+        {
+            //경사 올라갈 수 있을 때 까지 임시 주석 처리
+            //move = Stablillizer.ProjectOnGround(move, _controller, this);
+            move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
+        }
 
         _controller.Move(move * dt);
 
