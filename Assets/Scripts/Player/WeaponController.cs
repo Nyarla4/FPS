@@ -1,4 +1,3 @@
-//Ammo랑 Fire는 SO로 만들어서 인게임에서 바꿀 수 있도록 처리
 using UnityEngine;
 using System.Collections;
 
@@ -42,6 +41,9 @@ public class WeaponController : MonoBehaviour
     [Header("VFX")]
     public ParticleSystem HitVfxPrefab;         // 피격 스파크/먼지.
     public GameObject BulletDecalPrefab;        // 데칼(선택)
+
+    public ImpactEffectRouter ImpactRouter;//표면 임팩트 라우터
+    public bool ApplyHitboxMultiplier = true;//히트박스 배수 적용 여부
 
     // 내부 상태
     private int _ammoInMag;                      // 현재 탄창 잔탄.
@@ -220,9 +222,55 @@ public class WeaponController : MonoBehaviour
 
         if (got == true)
         {
+            float finalDamage = Damage;
+
+            Hitbox hb = hit.collider.GetComponent<Hitbox>();
+            if (hb != null)
+            {
+                Debug.Log($"{hb.gameObject.name} hit");
+                if (ApplyHitboxMultiplier)
+                {
+                    finalDamage = Damage * hb.DamageMultiplier;
+                }
+
+                if (hb.Owner != null)
+                {
+                    Debug.Log($"damage: {finalDamage}");
+                    hb.Owner.ApplyDamage(finalDamage, hit.point, hit.normal, transform);
+                }
+                else
+                {
+                    IDamageable id = hit.collider.GetComponentInParent<IDamageable>();
+                    if (id != null)
+                    {
+                        Debug.Log($"damage: {finalDamage}");
+                        id.ApplyDamage(finalDamage, hit.point, hit.normal, transform);
+                    }
+                }
+            }
+            else
+            {
+                IDamageable damage = hit.collider.GetComponentInParent<IDamageable>();
+                if (damage != null)
+                {
+                    Debug.Log($"damage: {finalDamage}");
+                    damage.ApplyDamage(finalDamage, hit.point, hit.normal, transform);
+                }
+            }
+
             // 데미지 인터페이스가 있다면 TryGetComponent로 처리 가능(데모에선 VFX/데칼만)
-            SpawnHitVfx(hit.point, hit.normal);//정면으로 레이 발사 => 명중하는 오브젝트 확인 => 해당 오브젝트가 맞는 VFX 처리
-            SpawnDecal(hit.point, hit.normal);
+
+            //표면 임팩트(오디오, VFX, 데칼)
+            if (ImpactRouter != null)
+            {
+                ImpactRouter.SpawnImpact(hit);
+            }
+            else
+            {//라우터 없으면 기본 호출
+                //정면으로 레이 발사 => 명중하는 오브젝트 확인 => 해당 오브젝트가 맞는 VFX 처리
+                SpawnHitVfx(hit.point, hit.normal);
+                SpawnDecal(hit.point, hit.normal);
+            }
         }
     }
 
