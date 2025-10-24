@@ -14,5 +14,5 @@ public enum SurfaceType
 [DisallowMultipleComponent]
 public class SurfaceMaterial : MonoBehaviour
 {
-    public SurfaceType surfaceType = SurfaceType.Concrete;//표면재질의 기본 값
+    public SurfaceType SurfaceType_ = SurfaceType.Concrete;//표면재질의 기본 값
 }

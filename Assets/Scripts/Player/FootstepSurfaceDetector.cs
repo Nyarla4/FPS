@@ -42,7 +42,7 @@ public class FootstepSurfaceDetector : MonoBehaviour
             SurfaceMaterial s = hit.collider.GetComponent<SurfaceMaterial>();
             if (s != null)
             {
-                surface = s.surfaceType;
+                surface = s.SurfaceType_;
                 return true;
             }
             else
