@@ -2,15 +2,15 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// vmffpdldjdyd cpfur rngus
-/// akcksrkwlfh IDamageable rngus
+/// 플레이어의 체력 관리
+/// 외부에서 호출 시 IDamageable 인터페이스 사용
 /// </summary>
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    [SerializeField] float _maxHealth = 100.0f;//chleocpfur
-    public UnityEvent OnDeath;//tkakd dlqpsxm(flxmfkdlsk fltmvhs dusehd)
+    [SerializeField] float _maxHealth = 100.0f; // 최대체력
+    public UnityEvent OnDeath; // 사망 이벤트(사운드나 애니메이션 호출용)
 
-    private float _currentHealth;//guswo cpfur
+    private float _currentHealth; // 현재 체력
     public float CurrentHealth => _currentHealth;
 
     private void Awake()
@@ -20,7 +20,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     void Update()
     {
-        
+
     }
 
     public void ApplyDamage(float amount, Vector3 hitPoint, Vector3 hitNormal, Transform source)
