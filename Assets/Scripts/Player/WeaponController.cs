@@ -53,6 +53,9 @@ public class WeaponController : MonoBehaviour
     private bool _adsHeld;                       // 입력: ADS 누름.
     private float _fovVel;                       // FOV SmoothDamp 속도 캐시.
 
+    public WeaponProjectileLauncher Launcher;//chddkf Prefab qkftkfmf dnlgks ckawhdyd
+    public bool UseBulletPrefab;
+
     private void Start()
     {
         _ammoInMag = MagSize; // 시작 시 가득 장전.
@@ -98,9 +101,17 @@ public class WeaponController : MonoBehaviour
         }
 
         // 4) 발사 처리(자동사격: 버튼 유지 시 연사)
-        if (_fireHeld == true)
+        if (_fireHeld)
         {
             TryFire();
+            //if(Launcher != null && UseBulletPrefab)
+            //{
+            //    Launcher.FireOne();
+            //}
+            //else
+            //{
+            //    TryFire();
+            //}
         }
     }
 
@@ -167,7 +178,14 @@ public class WeaponController : MonoBehaviour
         ApplyRecoilKick();
 
         // 6) 히트스캔.
-        DoHitscan();
+        if (Launcher != null && UseBulletPrefab)
+        {
+            Launcher.FireOne();
+        }
+        else
+        {
+            DoHitscan();
+        }
 
         // 7) 크로스헤어 확산 펄스.
         if (Crosshair != null)
