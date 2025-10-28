@@ -3,26 +3,26 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// vmffpdldj xncjr zjsxmfhffj
-///     qjxms xoq: rlqhstprl wmrtl ejswlrl
-///     qjxms ghfem: vkdnj cnrcjr(dhqtus)dmf rjcu ejswlrl
+/// 폭발물 던지기 제어 스크립트
+///     짧은 조작: 기본속도로 던짐
+///     길게 누름: 던지기 힘(파워)을 충전 후 던짐
 /// </summary>
 public class ThrowableController : MonoBehaviour
 {
     [Header("Refs")]
-    public Camera PlayerCamera; // ejswlf qkdgid rlwns
-    public Transform Hand;// ths/ ejswlsms dnjswja
-    public Grenade GrenadePrefab;//tnfbxks vmflvoq
+    public Camera PlayerCamera; // 플레이어 시야 카메라
+    public Transform Hand; // 손/ 카메라의 위치
+    public Grenade GrenadePrefab; //수류탄 프리팹
 
     [Header("Throw")]
-    public float BaseThrowSpeed = 14.0f;//rlqhs ejswlrl thrfur
-    public float MaxThrowSpeed = 22.0f;//ghfemgksms ruddn chleo thrfur
-    public float ChargeTime = 1.0f;//chleo tprlRkwl rjfflsms tlrks(ch)
-    public float AngularSpin = 20.0f;//ghlwjs(tlrkr)
+    public float BaseThrowSpeed = 14.0f; //기본 던지기 속도
+    public float MaxThrowSpeed = 22.0f; //충전했을 때 최대 속도
+    public float ChargeTime = 1.0f; //충전 완료까지 걸리는 시간(초)
+    public float AngularSpin = 20.0f; //회전속도(랜덤)
 
-    private bool _charging;//vkdnj cndwjswnd duqn
-    private float _charge;//0~1 snwjrehls vkdnj
-    private bool _fireRequested;//dlqfur flfflwm rkawl
+    private bool _charging; //충전 중 여부
+    private float _charge; //0~1 사이값으로 충전 정도
+    private bool _fireRequested; //던지기 요청 플래그
 
     void Update()
     {
@@ -33,14 +33,14 @@ public class ThrowableController : MonoBehaviour
         }
 
         if (_charging)
-        {//vkdnj cndwjs cjfl
+        {//충전 중일 때
             float inc = 0.0f;
             if (ChargeTime > 0.0001f)
             {
                 inc = Time.deltaTime / ChargeTime;
             }
             _charge += inc;
-            if(_charge > 1.0f)
+            if (_charge > 1.0f)
             {
                 _charge = 1.0f;
             }
@@ -63,27 +63,27 @@ public class ThrowableController : MonoBehaviour
 
     private void ThrowOne()
     {
-        if(GrenadePrefab == null || PlayerCamera == null)
+        if (GrenadePrefab == null || PlayerCamera == null)
         {
             return;
         }
 
-        //ejswlf dnjswja/qkdgid
-        Vector3 origin = Hand!=null?Hand.position : PlayerCamera.transform.position;
+        //카메라 위치/방향
+        Vector3 origin = Hand != null ? Hand.position : PlayerCamera.transform.position;
         Vector3 dir = PlayerCamera.transform.forward;
 
-        //thrfur rufwjd
+        //던지기 속도
         float spd = Mathf.Lerp(BaseThrowSpeed, MaxThrowSpeed, _charge);
-        Vector3 vel = dir*spd;
+        Vector3 vel = dir * spd;
 
-        //rkrthreh(ghlwjs duscnfdyd)
+        //회전값(랜덤 방향으로)
         Vector3 ang = Random.onUnitSphere * AngularSpin;
 
-        //dlstmxjstm todtjd gn Throw gkatn ghcnf
+        //수류탄을 생성 후 Throw 함수 호출
         Grenade g = Instantiate(GrenadePrefab, origin, Quaternion.identity);
         g.Throw(vel, ang);
 
-        //cndwjsrkqt chrlghk
+        //충전값 초기화
         _charge = 0.0f;
     }
 }

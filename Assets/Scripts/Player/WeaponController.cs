@@ -53,7 +53,7 @@ public class WeaponController : MonoBehaviour
     private bool _adsHeld;                       // 입력: ADS 누름.
     private float _fovVel;                       // FOV SmoothDamp 속도 캐시.
 
-    public WeaponProjectileLauncher Launcher;//chddkf Prefab qkftkfmf dnlgks ckawhdyd
+    public WeaponProjectileLauncher Launcher;//총알 Prefab 발사를 위한 참조용
     public bool UseBulletPrefab;
 
     private void Start()
