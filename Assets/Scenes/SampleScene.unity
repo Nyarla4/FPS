@@ -3004,6 +3004,93 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &758204303
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 758204307}
+  - component: {fileID: 758204306}
+  - component: {fileID: 758204305}
+  - component: {fileID: 758204304}
+  m_Layer: 0
+  m_Name: StatusEffects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &758204304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758204303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb9cd4be343fa42479f13e90699236b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EffectName: Stun
+  Icon: {fileID: 0}
+  Duraion: 3
+  RefreshOnReapply: 1
+--- !u!114 &758204305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758204303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dea454ba6f1db44fbb3e05e6e1e8aae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EffectName: Slow
+  Icon: {fileID: 0}
+  Duraion: 3
+  RefreshOnReapply: 1
+  _speedMultiplier: 0.6
+--- !u!114 &758204306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758204303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0be943b2ffd074b99cafee3d4b4857, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EffectName: Dot
+  Icon: {fileID: 0}
+  Duraion: 3
+  RefreshOnReapply: 1
+  DpsPerStack: 5
+  TickInterval: 0.5
+  MaxStack: 5
+  ExtendDurationOnReapply: 1
+--- !u!4 &758204307
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758204303}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.6000001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &764596038
 GameObject:
   m_ObjectHideFlags: 0
@@ -9892,6 +9979,7 @@ GameObject:
   - component: {fileID: 2138946594}
   - component: {fileID: 2138946593}
   - component: {fileID: 2138946595}
+  - component: {fileID: 2138946596}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -9967,8 +10055,8 @@ MonoBehaviour:
   _attackCooldown: 1.2
   _patrolDuration: 3
   _drawForward: 1
-  _state: 0
   _patrolPoints: []
+  _host: {fileID: 2138946596}
 --- !u!143 &2138946593
 CharacterController:
   m_ObjectHideFlags: 0
@@ -10031,6 +10119,18 @@ MonoBehaviour:
   _cam: {fileID: 330585545}
   _offSet: {x: 0, y: 2, z: 0}
   _headTrans: {fileID: 1830974254}
+--- !u!114 &2138946596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138946589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f6c60fcb2271af4ebe8c1e6ea3dbdc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -10055,3 +10155,4 @@ SceneRoots:
   - {fileID: 635520989}
   - {fileID: 2138946591}
   - {fileID: 1714536166}
+  - {fileID: 758204307}

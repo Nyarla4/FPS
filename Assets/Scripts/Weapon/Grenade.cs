@@ -30,6 +30,7 @@ public class Grenade : MonoBehaviour
     private Rigidbody _rb; // 수류탄의 Rigidbody (Rigidbody reference)
     private float _timer; // 폭발까지 남은 시간 (Remaining fuse timer)
 
+    [SerializeField] private statusEffects _staus;
     private void Awake()
     {
         if (_rb == null)
@@ -115,8 +116,39 @@ public class Grenade : MonoBehaviour
             Vector3 n = (hp - transform.position).normalized;
 
             id.ApplyDamage(dmg, hp, n, transform);
+
+            //상태이상 효과
+            switch (_staus)
+            {
+                case statusEffects.None:
+                    break;
+                case statusEffects.Dot:
+                    StatusEffect_Dot dotPreset = FindFirstObjectByType<StatusEffect_Dot>();
+                    if (dotPreset != null)
+                    {
+                        StatusEffectApplier.ApplyTo(c.gameObject, dotPreset);
+                    }
+                    break;
+                case statusEffects.Slow:
+                    StatusEffect_Slow slow = FindFirstObjectByType<StatusEffect_Slow>();
+                    if (slow != null)
+                    {
+                        StatusEffectApplier.ApplyTo(c.gameObject, slow);
+                    }
+                    break;
+                case statusEffects.Stun:
+                    StatusEffect_Stun stun = FindFirstObjectByType<StatusEffect_Stun>();
+                    if (stun != null)
+                    {
+                        StatusEffectApplier.ApplyTo(c.gameObject, stun);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
+        //파괴
         Destroy(gameObject); // 폭발 후 오브젝트 삭제 (Destroy grenade after explosion)
     }
 

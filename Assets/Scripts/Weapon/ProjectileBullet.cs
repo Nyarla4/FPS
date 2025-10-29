@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 /// <summary>
 /// 탄환 클래스
@@ -29,6 +28,7 @@ public class ProjectileBullet : MonoBehaviour
     private Vector3 _lastPosition;//이전 프레임 위치(Sweep 시작 위치)
     private float _life;//생존 시간
 
+    [SerializeField] private statusEffects _staus;
     private void Awake()
     {//생성시 초기화 Spawn에서 호출됨
         _velocity = transform.forward * Speed;
@@ -154,6 +154,36 @@ public class ProjectileBullet : MonoBehaviour
         {
             Quaternion rot = Quaternion.LookRotation(-hit.normal);
             GameObject decal = Instantiate(DecalPrefab, hit.point + hit.normal * DecalOffset, rot);
+        }
+
+        //상태이상 효과
+        switch (_staus)
+        {
+            case statusEffects.None:
+                break;
+            case statusEffects.Dot:
+                StatusEffect_Dot dotPreset = FindFirstObjectByType<StatusEffect_Dot>();
+                if (dotPreset != null)
+                {
+                    StatusEffectApplier.ApplyTo(hit.collider.gameObject, dotPreset);
+                }
+                break;
+            case statusEffects.Slow:
+                StatusEffect_Slow slow = FindFirstObjectByType<StatusEffect_Slow>();
+                if (slow != null)
+                {
+                    StatusEffectApplier.ApplyTo(hit.collider.gameObject, slow);
+                }
+                break;
+            case statusEffects.Stun:
+                StatusEffect_Stun stun = FindFirstObjectByType<StatusEffect_Stun>();
+                if (stun != null)
+                {
+                    StatusEffectApplier.ApplyTo(hit.collider.gameObject, stun);
+                }
+                break;
+            default:
+                break;
         }
     }
 }

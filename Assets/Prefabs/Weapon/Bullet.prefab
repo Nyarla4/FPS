@@ -52,11 +52,12 @@ MonoBehaviour:
   HitMask:
     serializedVersion: 2
     m_Bits: 192
-  Damage: 20
+  Damage: 100
   HeadshotMultiplier: 2
   ImpactVfxPrefab: {fileID: 0}
   DecalPrefab: {fileID: 0}
   DecalOffset: 0.01
+  _staus: 1
 --- !u!1 &1689401373975836900
 GameObject:
   m_ObjectHideFlags: 0

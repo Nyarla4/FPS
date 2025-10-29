@@ -44,7 +44,7 @@ public class EnemyAIFlat : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool _drawForward = false;//전방 방향선 표시 여부
 
-    [SerializeField]//테스트용
+    //[SerializeField]//테스트용
     private State _state;//현재 FSM 상태
     private float _attackTimer;//공격 대기 타이머(0이면 공격 가능)
     private float _patrolTimer;//patrol 유지 시간
@@ -52,6 +52,7 @@ public class EnemyAIFlat : MonoBehaviour
 
     [SerializeField] private List<Transform> _patrolPoints;
 
+    [SerializeField] private StatusEffectHost _host;
     private void Awake()
     {
         if (_controller == null)
@@ -171,15 +172,21 @@ public class EnemyAIFlat : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, look, Time.deltaTime * _rotateSpeed);
         }
 
-        //거리계산/이동
+        //정지거리/전진
         float dist = Vector3.Distance(transform.position, flatTarget);
 
         if (dist > _stoppingDistance)
         {
-            //이동 벡터(전방 방향)
-            Vector3 move = transform.forward * _chaseSpeed;
+            float speedMul = 1.0f;
+            if (_host != null)
+            {
+                speedMul = _host.SpeedMultiplier;
+            }
 
-            //cc 중력 적용(기본값으로 하강 처리)
+            //전진 벡터(월드 전방 기준)
+            Vector3 move = transform.forward * (_chaseSpeed * speedMul);
+
+            //cc 안정화를 위한 중력 보정(평지에서도 경계에서의 떨림 줄임 용도)
             move.y = _gravity;
 
             _controller.Move(move * Time.deltaTime);
@@ -214,6 +221,15 @@ public class EnemyAIFlat : MonoBehaviour
 
     private void UpdateAttack(bool seen)
     {
+        //스턴중이면 리턴 처리
+        if (_host != null)
+        {
+            if (_host.IsStunned)
+            {
+                return;
+            }
+        }
+
         //공격 범위 밖이면 Chase로 복귀
         if (_player != null)
         {
