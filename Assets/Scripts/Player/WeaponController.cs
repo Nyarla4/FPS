@@ -18,18 +18,8 @@ public class WeaponController : MonoBehaviour
     public CrosshairUI Crosshair;               // 크로스헤어 확산 반영.
     public AmmoHUD AmmoHud;                     // 탄약 표시 TMP.
 
-    [Header("Ammo")]
-    public int MagSize = 30;                    // 탄창 크기.
-    public int ReserveAmmo = 90;                // 예비 탄약.
-    public float ReloadTime = 1.9f;             // 재장전 시간(초)
-    public bool ChamberedRound = true;          // 실탄 한 발 장전 방식(선택)
-
-    [Header("Fire")]
-    public float FireRate = 10.0f;              // 초당 발사수(10 → 0.1초 간격)
-    public float Damage = 20.0f;                // 히트 데미지(데모용)
-    public float MaxRange = 150.0f;             // 히트스캔 최대 사거리.
-    public AudioClip ShotSfx;                   // 발사음.
-    public AudioClip DrySfx;                    // 빈 탄창 클릭음.
+    [Header("GunKind")]
+    public GunKind_SO Gun;
 
     [Header("ADS")]
     public float AdsFov = 55.0f;                // ADS 시 FOV
@@ -58,7 +48,7 @@ public class WeaponController : MonoBehaviour
 
     private void Start()
     {
-        _ammoInMag = MagSize; // 시작 시 가득 장전.
+        _ammoInMag = Gun.MagSize; // 시작 시 가득 장전.
         if (PlayerCamera != null)
         {
             //fov 초기화
@@ -132,12 +122,12 @@ public class WeaponController : MonoBehaviour
         {
             return;
         }
-        if (_ammoInMag >= MagSize)
+        if (_ammoInMag >= Gun.MagSize)
         {
             // 이미 가득 차 있으면 무시.
             return;
         }
-        if (ReserveAmmo <= 0)
+        if (Gun.ReserveAmmo <= 0)
         {
             return;
         }
@@ -169,7 +159,7 @@ public class WeaponController : MonoBehaviour
         UpdateAmmoHud();//탄 소비시 HUD 갱신
 
         // 4) 발사 쿨다운 셋.
-        float interval = 1.0f / FireRate;
+        float interval = 1.0f / Gun.FireRate;
         _fireCooldown = interval;
 
         // 5) 이펙트/사운드/반동.
@@ -201,20 +191,20 @@ public class WeaponController : MonoBehaviour
         // (선택) 재장전 사운드/애니메이션 훅.
         // audioSource.PlayOneShot(reloadSfx);
 
-        yield return new WaitForSeconds(ReloadTime);
+        yield return new WaitForSeconds(Gun.ReloadTime);
 
-        int needed = MagSize - _ammoInMag;
+        int needed = Gun.MagSize - _ammoInMag;
         if (needed < 0)
         {
             needed = 0;
         }
-        int toLoad = Mathf.Min(needed, ReserveAmmo);
+        int toLoad = Mathf.Min(needed, Gun.ReserveAmmo);
 
         _ammoInMag += toLoad;
-        ReserveAmmo -= toLoad;
+        Gun.ReserveAmmo -= toLoad;
 
         // 실탄 한 발 장전 방식이면, 빈 탄창에서 리로드 시 +1 허용.
-        if (ChamberedRound == true)
+        if (Gun.ChamberedRound == true)
         {
             if (_ammoInMag > 0)
             {
@@ -236,11 +226,11 @@ public class WeaponController : MonoBehaviour
         // 카메라 정중앙에서 레이캐스트.
         Ray ray = new Ray(PlayerCamera.transform.position, PlayerCamera.transform.forward);
         RaycastHit hit;
-        bool got = Physics.Raycast(ray, out hit, MaxRange, HitMask, QueryTriggerInteraction.Ignore);
+        bool got = Physics.Raycast(ray, out hit, Gun.MaxRange, HitMask, QueryTriggerInteraction.Ignore);
 
         if (got == true)
         {
-            float finalDamage = Damage;
+            float finalDamage = Gun.Damage;
 
             Hitbox hb = hit.collider.GetComponent<Hitbox>();
             if (hb != null)
@@ -248,7 +238,7 @@ public class WeaponController : MonoBehaviour
                 Debug.Log($"{hb.gameObject.name} hit");
                 if (ApplyHitboxMultiplier)
                 {
-                    finalDamage = Damage * hb.DamageMultiplier;
+                    finalDamage = Gun.Damage * hb.DamageMultiplier;
                 }
 
                 if (hb.Owner != null)
@@ -328,9 +318,9 @@ public class WeaponController : MonoBehaviour
     {
         if (_audioSource != null)
         {
-            if (ShotSfx != null)
+            if (Gun.ShotSfx != null)
             {
-                _audioSource.PlayOneShot(ShotSfx, 1.0f);
+                _audioSource.PlayOneShot(Gun.ShotSfx, 1.0f);
             }
         }
     }
@@ -339,9 +329,9 @@ public class WeaponController : MonoBehaviour
     {
         if (_audioSource != null)
         {
-            if (DrySfx != null)
+            if (Gun.DrySfx != null)
             {
-                _audioSource.PlayOneShot(DrySfx, 1.0f);
+                _audioSource.PlayOneShot(Gun.DrySfx, 1.0f);
             }
         }
     }
@@ -393,7 +383,7 @@ public class WeaponController : MonoBehaviour
     {
         if (AmmoHud != null)
         {   //남은 탄량 표시
-            AmmoHud.SetAmmo(_ammoInMag, ReserveAmmo);
+            AmmoHud.SetAmmo(_ammoInMag, Gun.ReserveAmmo);
         }
     }
 }
