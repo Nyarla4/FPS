@@ -62,8 +62,7 @@ public class PlayerController : MonoBehaviour
         //경사나 계단에서 보정 처리
         if (Stablillizer != null)
         {
-            //경사 올라갈 수 있을 때 까지 임시 주석 처리
-            //move = Stablillizer.ProjectOnGround(move, _controller, this);
+            move = Stablillizer.ProjectOnGround(move, _controller, this);
             move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
         }
 
@@ -72,7 +71,7 @@ public class PlayerController : MonoBehaviour
         if (Stablillizer != null)
         {
             if (_controller.velocity.y <= 0.0f)
-            {//Ejfdjwlrh dlTsms tkdghkddls ruddn
+            {//떨어지고 있는 상황인 경우
                 Stablillizer.TrySnapDown(_controller, this);
             }
         }

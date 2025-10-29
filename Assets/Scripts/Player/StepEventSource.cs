@@ -42,7 +42,6 @@ public class StepEventSource : MonoBehaviour
 
     void Update()
     {
-        float dt = Time.deltaTime;
         float now = Time.time;
 
         //지면 접촉여부를 확인하고 발자국 이벤트 관리

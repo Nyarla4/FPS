@@ -109,6 +109,11 @@ public class GroundingStablillizer : MonoBehaviour
             }
         }
 
+        if(move.x * 2f < -onPlane.x || move.z * 2f < -onPlane.z)
+        {//반대방향으로 되면 그대로 반환, 경사를 못올라가더라
+            return move;
+        }
+
         //수직 속도(y)는 그대로 유지
         onPlane.y = move.y;
         return onPlane;
