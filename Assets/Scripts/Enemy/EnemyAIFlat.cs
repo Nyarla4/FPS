@@ -37,6 +37,7 @@ public class EnemyAIFlat : MonoBehaviour
     [SerializeField] private float _attackRange = 1.8f;//타겟 공격(m)
     [SerializeField] private float _attackDamage = 10.0f;//공격력
     [SerializeField] private float _attackCooldown = 1.2f;//공격 쿨타임(초). 0이면 즉시
+    [SerializeField] private statusEffects _attackEffect;
 
     [Header("Patrol")]
     [SerializeField] private float _patrolDuration = 3.0f;//시야 밖에서 플레이어 위치로 이동 후 대기 시간(초)
@@ -280,6 +281,36 @@ public class EnemyAIFlat : MonoBehaviour
 
         //피격 처리 예시 : hitPoint는 타겟 위치, 방향은 Vector3.up 고정
         _playerDamageable.ApplyDamage(_attackDamage, _player.position, Vector3.up, transform);
+
+        //상태이상 처리
+        switch (_attackEffect)
+        {
+            case statusEffects.None:
+                break;
+            case statusEffects.Dot:
+                StatusEffect_Dot dotPreset = FindFirstObjectByType<StatusEffect_Dot>();
+                if (dotPreset != null)
+                {
+                    StatusEffectApplier.ApplyTo(_player.gameObject, dotPreset);
+                }
+                break;
+            case statusEffects.Slow:
+                StatusEffect_Slow slow = FindFirstObjectByType<StatusEffect_Slow>();
+                if (slow != null)
+                {
+                    StatusEffectApplier.ApplyTo(_player.gameObject, slow);
+                }
+                break;
+            case statusEffects.Stun:
+                StatusEffect_Stun stun = FindFirstObjectByType<StatusEffect_Stun>();
+                if (stun != null)
+                {
+                    StatusEffectApplier.ApplyTo(_player.gameObject, stun);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     private void EnterPatrol()
