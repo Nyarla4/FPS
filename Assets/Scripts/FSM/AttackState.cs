@@ -1,11 +1,9 @@
-using System.Data;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary>
-/// Attack: tkrjfl sodptj znfekdnsdmf wlzlau vmffpdldjfmf rhdrur
-///     tkrjfl dlxkf tl Chase
-///     tldi dhksjs tkdtlftl Search
+/// Attack: 사거리 안에서 쿨다운을 지키며 플레이어를 공격
+///     공격 불가 시 Chase
+///     시야 상실 시 Search
 /// </summary>
 public class AttackState : BaseState
 {
@@ -25,8 +23,8 @@ public class AttackState : BaseState
 
     public override void OnEnter()
     {
-        //rhdrurtkdxo wlsdlq tl znfekdnsdmf wmrtl 0dmfh cjfl
-        //  wmrtl 1ghl rhdrur
+        //공격타이머를 리셋 및 쿨다운 상태로 초기화
+        //  초기값 0으로 설정
         _context.AttackTimer = 0.0f;
     }
 
@@ -40,7 +38,7 @@ public class AttackState : BaseState
             }
         }
 
-        //tldi vkseks + LastKnownPos rodtls
+        //시야 확인 + LastKnownPos 갱신
         bool seen = false;
         Vector3 seenPos = Vector3.zero;
 
@@ -53,35 +51,35 @@ public class AttackState : BaseState
             }
         }
 
-        //tkrjfl dbwl cpzm => dlxkf tl Chasefh qhrrnl
-        if(_context.DistanceToPlayer() > _context.AttackRange)
+        //사거리 밖일 경우 => Chase로 전환
+        if (_context.DistanceToPlayer() > _context.AttackRange)
         {
             _context.RequestStateChange(_context.Chase);
             return;
         }
 
-        //tldirk dhkswjsgl Rmsgrlaus => Search
+        //시야를 상실했을 경우 => Search
         if (!seen)
         {
             _context.RequestStateChange(_context.Search);
             return;
         }
 
-        //rhdrur znfekdns xkdlaj
+        //공격 쿨다운 감소
         if (_context.AttackTimer > 0.0f)
         {
             _context.AttackTimer -= dt;
         }
 
-        //znfekdnsdl 0dlaus rhdrur tlfgod
+        //쿨다운이 0이하일 경우 공격 수행
         if (_context.AttackTimer <= 0.0f)
         {
             DoAttack();
             _context.AttackTimer = _context.AttackCooldown;
         }
 
-        //tlrkr wjdfuf: vmffpdldj qkfkqhrp ghlwjs
-        if(_context.Player != null)
+        //방향 회전: 플레이어 쪽으로 회전
+        if (_context.Player != null)
         {
             _context.FacePosition(_context.Player.position, dt);
         }
@@ -89,12 +87,12 @@ public class AttackState : BaseState
 
     public override void OnExit()
     {
-        //djqtdma
+        //종료됨
     }
 
     /// <summary>
-    /// tlfwp eoalwlfmf vmffpdldjdprp wjsekf
-    ///     ekstns: vmffpdldj dnlclfmf vlrurdnlclfh tkdyd
+    /// 실제 공격을 플레이어에게 수행
+    ///     예시: 플레이어 컴포넌트에 데미지 적용
     /// </summary>
     private void DoAttack()
     {
@@ -104,17 +102,17 @@ public class AttackState : BaseState
         }
 
         IDamageable id = _context.Player.GetComponent<IDamageable>();
-        if (id==null)
+        if (id == null)
         {
             return;
         }
 
-        Vector3 hp = _context.Player.position;//glxm vhdlsxm(ekstnscjfl)
-        Vector3 n = Vector3.up;//qjqtjs(duscnfdyd)
+        Vector3 hp = _context.Player.position; //히트 위치(예시용)
+        Vector3 n = Vector3.up; //노멀(방향)
 
         id.ApplyDamage(_context.AttackDamage, hp, n, _context.transform);
 
-        //tkdxodltkd cjflsms skwnddp
+        //추가효과가 있다면 적용
         switch (_context.AttackEffect)
         {
             case statusEffects.None:
@@ -144,5 +142,4 @@ public class AttackState : BaseState
                 break;
         }
     }
-
 }

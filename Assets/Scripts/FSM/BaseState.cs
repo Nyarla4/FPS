@@ -1,20 +1,20 @@
 using UnityEngine;
 
 /// <summary>
-/// ahems wjr tkdxodml cntkd rlqks zmffotm
-/// rkr tkdxosms Enter/Update/Exit tnaudwnrlfmf xhdgo ehdwkr
-/// Contextdml rhddb epdlxj tkdyd
+/// 모든 상태의 기본 클래스
+/// 각 상태는 Enter/Update/Exit 메서드를 구현
+/// Context를 통해 참조 전달
 /// </summary>
 public abstract class BaseState
 {
     /// <summary>
-    /// tkdxork tkdydgkf zjsxprtmxm(rhddb epdlxj alc dbxlf aptjem wprhd)
+    /// 상태가 동작할 StateManager 참조
     /// </summary>
-    protected StateManager _context;//guswo rocpdml tkdxo rhksflwk(qusrud/wjsdl/rhddb rkqt wjqrms)
+    protected StateManager _context; //현재 상태가 작동할 대상(State/Idle/Dead 등)
 
     /// <summary>
-    /// tkdxo dlstmxjstmrk tkdydgkf zjsxprtmxm wndlq
-    /// ahems tkdxosms wjsghks tl ehddlf zjsxprtmxm rhddb
+    /// 상태 매니저를 설정
+    /// 모든 상태는 이를 통해 컨텍스트를 받음
     /// </summary>
     /// <param name="context"></param>
     public void SetContext(StateManager context)
@@ -23,35 +23,35 @@ public abstract class BaseState
     }
 
     /// <summary>
-    /// tkdxo wlsdlq tl ghcnf
-    /// doslapdltus/tkdnsem/chrl xkdlaj tpxld emd tngod
+    /// 상태 시작 시 호출
+    /// 초기화/효과/애니메이션 시작 등 처리
     /// </summary>
     public virtual void OnEnter()
     {
-        //vktod zmffotmdptj vlfdy tl rngus
+        //파생 상태에서 구현
     }
 
     /// <summary>
-    /// ao vmfpdla ghcnf
-    /// tkdxo rhdb fhwlr tngod
-    /// vlfdytl _context.RequestStateChange(...)fh wjsdl dycjd
+    /// 매 프레임 호출
+    /// 상태 동작 로직 처리
+    /// 필요시 _context.RequestStateChange(...)로 상태 변경 가능
     /// </summary>
     public virtual void OnUpdate(float dt)
     {
-        //vktod zmffotmdptj vlfdy tl rngus
+        //파생 상태에서 구현
     }
 
     /// <summary>
-    /// tkdxo whdfy wlrwjsdp ghcnf
-    /// xkdlaj/ vmfform wjdfl
+    /// 상태 종료 시 호출
+    /// 정리/후처리 수행
     /// </summary>
     public virtual void OnExit()
     {
-        //vktod zmffotmdptj vlfdy tl rngus
+        //파생 상태에서 구현
     }
 
     /// <summary>
-    /// elqjrmdyd tkdxoaud qksghks gkatn
+    /// 상태 이름 반환
     /// </summary>
     /// <returns></returns>
     public abstract string Name();

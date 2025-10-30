@@ -1,50 +1,49 @@
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// wjr FSM zjsxprtmxmdlwk wjsghksrl
-///     rhddyd epdlxj(zjavhsjsxm, vkfkalxj, fjsxkdla zotl) qhrhks
-///     guswo tkdxodml Enter/Update/Exit ghcnf
-///     tkdxo wjsghk sdycjddmf dkswjsgl tngod
+/// 적 FSM 시스템의 중심
+///     행동 모듈(시야시스템, 체력시스템, 상태이상 등) 관리
+///     현재 상태의 Enter/Update/Exit 호출
+///     상태 전환을 전체적으로 제어
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class StateManager : MonoBehaviour
 {
     [Header("Modules")]
-    public EnemySenses Senses;//tldi ahebf(rjfl/rkr/rkfla)
-    [SerializeField] private Health _health;//cpfur(tkakd xmflrj)
-    public Transform Player;//cnrur/rhdrur eotkd Transform
-    [SerializeField] private CharacterController _controller;//vudwl dlehddyd CC
+    public EnemySenses Senses;//시야 센서(보기/듣기/냄새)
+    [SerializeField] private Health _health;//체력(현재 생명치)
+    public Transform Player;//플레이어(공격 타겟) 트랜스폼
+    [SerializeField] private CharacterController _controller;//캐릭터 컨트롤러 CC
 
     [Header("Movement (flat)")]
-    public float ChaseSpeed = 3.0f;//cnwjr threh(m/s)
-    public float SearchSpeed = 1.8f;//tntor threh(m/s)
-    [SerializeField] private float _rotateSpeed = 12.0f;//ghlwjs qhrks threh
-    public float StoppingDistance = 1.2f;//ajacna rjfl
-    [SerializeField] private float _gravity = -20.0f;//wndfur rkthreh(dmatn)
+    public float ChaseSpeed = 3.0f;//추적 속도(m/s)
+    public float SearchSpeed = 1.8f;//탐색 속도(m/s)
+    [SerializeField] private float _rotateSpeed = 12.0f;//회전 관련 속도
+    public float StoppingDistance = 1.2f;//정지 거리
+    [SerializeField] private float _gravity = -20.0f;//중력 가속도(단위)
 
     [Header("Attack")]
-    public float AttackRange = 1.8f;//rhdrur tkrjfl
-    public float AttackDamage = 10.0f;//rhdrur eoalwl
-    public float AttackCooldown = 1.2f;//rhdrur rksrur(ch)
+    public float AttackRange = 1.8f;//공격 사거리
+    public float AttackDamage = 10.0f;//공격 데미지
+    public float AttackCooldown = 1.2f;//공격 쿨다운(초)
     public statusEffects AttackEffect;
 
     [Header("Search")]
-    public float SearchDuration = 3.0f;//tntor tlrks(ch)
+    public float SearchDuration = 3.0f;//탐색 지속(초)
 
     [Header("Debug")]
-    [SerializeField] private bool _drawForward = false;//wjsqkd elqjrm fpdl
+    [SerializeField] private bool _drawForward = false;//전방 디버그 표시
 
-    [HideInInspector] public Vector3 LastKnownPos;//akwlakr vmffpdldj whkvy
-    [HideInInspector] public float AttackTimer;//rhdrur znfekdns skadms tlrks
-    [HideInInspector] public float SearchTimer;//tntor skadms tlrks
+    [HideInInspector] public Vector3 LastKnownPos;//마지막 플레이어 위치
+    [HideInInspector] public float AttackTimer;//공격 쿨다운 남은 시간
+    [HideInInspector] public float SearchTimer;//탐색 남은 시간
 
-    [HideInInspector] public BaseState _currentState;//guswotkdxo
-    [HideInInspector] public IdleState Idle;//Idle tkdxo dlstmxjstm
-    [HideInInspector] public ChaseState Chase;//Chase tkdxo dlstmxjstm
-    [HideInInspector] public AttackState Attack;//Attack tkdxo dlstmxjstm
-    [HideInInspector] public SearchState Search;//Search tkdxo dlstmxjstm
-    [HideInInspector] public DeadState Dead;//Dead tkdxo dlstmxjstm
+    [HideInInspector] public BaseState _currentState;//현재상태
+    [HideInInspector] public IdleState Idle;//Idle 상태 인스턴스
+    [HideInInspector] public ChaseState Chase;//Chase 상태 인스턴스
+    [HideInInspector] public AttackState Attack;//Attack 상태 인스턴스
+    [HideInInspector] public SearchState Search;//Search 상태 인스턴스
+    [HideInInspector] public DeadState Dead;//Dead 상태 인스턴스
 
     public StatusEffectHost StatusHost;
 
@@ -67,7 +66,7 @@ public class StateManager : MonoBehaviour
             GameObject closestPl = null;
             for (int plIdx = 0; plIdx < players.Length; plIdx++)
             {
-                var curPl =players[plIdx];
+                var curPl = players[plIdx];
                 var dist = Vector3.Distance(transform.position, curPl.transform.position);
                 if (closestDist > dist)
                 {
@@ -93,20 +92,20 @@ public class StateManager : MonoBehaviour
             StatusHost = GetComponent<StatusEffectHost>();
         }
 
-        //tkdxo dlstmxjstm todtjd alc zjsxprtmxm wndlq
-        //durltj wkrtjdgks State rocpemfdms monobehaviorrk djqtdmamfh wlrwjq todtjdgodigka
+        //상태 인스턴스 초기 생성 및 시스템 연결
+        //여기서 작성한 State 개체들은  monobehavior가 없으므로 직접 생성해야함
         Idle = new(this);
         Chase = new(this);
         Attack = new(this);
         Search = new(this);
         Dead = new(this);
 
-        //chrl fjsxkdla zotlrkqt tpxld
+        //현재 상태이상 위치로 초기화
         LastKnownPos = transform.position;
         AttackTimer = 0.0f;
         SearchTimer = 0.0f;
 
-        //chlch tkdxo wlsdlq: Idle
+        //최초 상태 설정: Idle
         RequestStateChange(Idle);
     }
 
@@ -114,7 +113,7 @@ public class StateManager : MonoBehaviour
     {
         float dt = Time.deltaTime;
 
-        //tkakd cpzmsms dlfrhkf rkatl(tkdxo antl)
+        //체력 상태를 확인 후 사망(상태 진입)
         if (_health != null)
         {
             if (_health.CurrentHealth <= 0.0f)
@@ -127,13 +126,13 @@ public class StateManager : MonoBehaviour
             }
         }
 
-        //wjsqkd elqjrm tjfwjdtl
+        //전방 디버그 표시선
         if (_drawForward)
         {
             Debug.DrawRay(transform.position + Vector3.up * 1.0f, transform.forward * 1.5f, Color.yellow, 0.02f);
         }
 
-        //guswo tkdxo djqepdlxm
+        //현재 상태 업데이트
         if (_currentState != null)
         {
             _currentState.OnUpdate(dt);
@@ -141,9 +140,9 @@ public class StateManager : MonoBehaviour
     }
 
     /// <summary>
-    /// dkswjstks tkdxo wjsghks
-    /// Exit => tkdxo rycp => Enter ghcnf
-    /// null wjsekfdms antl
+    /// 상태간 전환
+    /// Exit => 상태 종료 => Enter 호출
+    /// null 입력되면 무시
     /// </summary>
     public void RequestStateChange(BaseState next)
     {
@@ -161,16 +160,16 @@ public class StateManager : MonoBehaviour
         _currentState.OnEnter();
     }
 
-    #region rhdxhd dbxlf(rkr tkdxodptj ghcnf)
+    #region 회전 관련(또는 이동 관련)
     /// <summary>
-    /// vudwl wjscpdptj ahrvywjadmf gidgo ghlwjs(tnvud qhwjd vhgka)
+    /// 캐릭터 전방방향을 타겟쪽으로 회전(지면 평면 기준)
     /// </summary>
     public void FacePosition(Vector3 target, float dt)
     {
         Vector3 flatTarget = target;
         flatTarget.y = transform.position.y;
 
-        Vector3 to = flatTarget - transform.position;//tnvud qkdgid
+        Vector3 to = flatTarget - transform.position;//지면 기준 벡터
         to.y = 0.0f;
 
         if (to.sqrMagnitude > 0.0001f)
@@ -181,18 +180,18 @@ public class StateManager : MonoBehaviour
     }
 
     /// <summary>
-    /// vudwl wjscpdptj wjswls dlehd(wndfur qhwjd vhgka)
+    /// 캐릭터 전방으로 이동(중력 포함 기준)
     /// </summary>
     public void MoveForward(float speed, float dt)
     {
-        Vector3 move = transform.forward * speed;//wjswls threh
-        move.y = _gravity;//rudrP dkswjdghkdyd wndfur
+        Vector3 move = transform.forward * speed;//전방 속도
+        move.y = _gravity;//지속적으로 중력 적용
 
         _controller.Move(move * dt);
     }
 
     /// <summary>
-    /// vmffpdldjdhkdml guswo rjfl qksghks
+    /// 플레이어와의 현재 거리 반환
     /// </summary>
     public float DistanceToPlayer()
     {
@@ -206,12 +205,12 @@ public class StateManager : MonoBehaviour
     }
 
     /// <summary>
-    /// guswo tkdxoaud answkduf(elqjrm/HUD dyd)
+    /// 현재 상태명을 반환(디버그/HUD 용)
     /// </summary>
     /// <returns></returns>
     public string CurrentStateName()
     {
-        if(_currentState == null)
+        if (_currentState == null)
         {
             return "None";
         }

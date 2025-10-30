@@ -1,10 +1,9 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
-/// Chase: akwlakrdmfh qhs vmffpdldj dnlclfh ghlwjs/wjswls
-/// tkrjfl dlsoaus Attack
-/// tldi tkdtlf gn ehckr tl Search
+/// Chase: 마지막으로 본 플레이어 위치를 향해 이동/추적
+/// 사거리 진입 시 Attack
+/// 시야 상실 및 도달 시 Search
 /// </summary>
 public class ChaseState : BaseState
 {
@@ -24,8 +23,8 @@ public class ChaseState : BaseState
 
     public override void OnEnter()
     {
-        //znfekdnsdms AttackStatedptj rhksfl
-        //Chasedptjsms chrlghkgkf gkdahr djqtdam
+        //공격상태로의 전환을 준비
+        //Chase 상태에서는 이동 시작
     }
 
     public override void OnUpdate(float dt)
@@ -40,7 +39,7 @@ public class ChaseState : BaseState
             speedMul = _context.StatusHost.SpeedMultiplier;
         }
 
-        //tldi rodtls
+        //시야 체크
         bool seen = false;
         Vector3 seenPos = Vector3.zero;
 
@@ -53,24 +52,24 @@ public class ChaseState : BaseState
             }
         }
 
-        //ghlwjs/wjswls
+        //위치를 향해 회전
         _context.FacePosition(_context.LastKnownPos, dt);
 
         float distToLast = Vector3.Distance(_context.transform.position, _context.LastKnownPos);
-        if(distToLast > _context.StoppingDistance)
+        if (distToLast > _context.StoppingDistance)
         {
             _context.MoveForward(_context.ChaseSpeed * speedMul, dt);
         }
 
-        //tkrjfl vkswjd => Attack
+        //공격 사거리 진입 시 => Attack
         float distToPlayer = _context.DistanceToPlayer();
-        if(distToPlayer <= _context.AttackRange)
+        if (distToPlayer <= _context.AttackRange)
         {
             _context.RequestStateChange(_context.Attack);
             return;
         }
 
-        //tldi tkdtlf tkdxofh ahrwjrwl ehckr => Search
+        //시야 상실 및 목표 지점 도달 시 => Search
         if (!seen)
         {
             if (distToLast <= _context.StoppingDistance)
@@ -83,6 +82,6 @@ public class ChaseState : BaseState
 
     public override void OnExit()
     {
-        //djqtdma
+        //상태 종료
     }
 }
