@@ -3221,7 +3221,7 @@ GameObject:
   - component: {fileID: 794497105}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9993,6 +9993,7 @@ GameObject:
   - component: {fileID: 2138946593}
   - component: {fileID: 2138946595}
   - component: {fileID: 2138946596}
+  - component: {fileID: 2138946597}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -10049,7 +10050,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2138946589}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ff88289aad409043ab1d5ba0addbe26, type: 3}
   m_Name: 
@@ -10114,7 +10115,7 @@ MonoBehaviour:
   VisionMask:
     serializedVersion: 2
     m_Bits: 320
-  Target: {fileID: 794497092}
+  Target: {fileID: 0}
   DrawDebug: 1
 --- !u!114 &2138946595
 MonoBehaviour:
@@ -10145,6 +10146,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f6c60fcb2271af4ebe8c1e6ea3dbdc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2138946597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2138946589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ae38a268cd82564b8da8e435b486585, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Senses: {fileID: 2138946594}
+  _health: {fileID: 2138946590}
+  Player: {fileID: 0}
+  _controller: {fileID: 2138946593}
+  ChaseSpeed: 3
+  SearchSpeed: 1.8
+  _rotateSpeed: 12
+  StoppingDistance: 1.2
+  _gravity: -20
+  AttackRange: 1.8
+  AttackDamage: 10
+  AttackCooldown: 1.2
+  AttackEffect: 2
+  SearchDuration: 3
+  _drawForward: 1
+  LastKnownPos: {x: 0, y: 0, z: 0}
+  AttackTimer: 0
+  SearchTimer: 0
+  StatusHost: {fileID: 2138946596}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
