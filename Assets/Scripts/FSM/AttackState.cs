@@ -74,6 +74,7 @@ public class AttackState : BaseState
         //쿨다운이 0이하일 경우 공격 수행
         if (_context.AttackTimer <= 0.0f)
         {
+            _context.SetAnimationTrigger("Attack");
             DoAttack();
             _context.AttackTimer = _context.AttackCooldown;
         }

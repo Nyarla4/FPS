@@ -47,6 +47,8 @@ public class StateManager : MonoBehaviour
 
     public StatusEffectHost StatusHost;
 
+    [SerializeField] private Animator _animator;
+
     private void Awake()
     {
         if (_controller == null)
@@ -121,8 +123,8 @@ public class StateManager : MonoBehaviour
                 if (_currentState != Dead)
                 {
                     RequestStateChange(Dead);
+                    return;
                 }
-                return;
             }
         }
 
@@ -158,6 +160,8 @@ public class StateManager : MonoBehaviour
 
         _currentState = next;
         _currentState.OnEnter();
+
+        SyncAnimatorWithState(_currentState);
     }
 
     #region 회전 관련(또는 이동 관련)
@@ -218,4 +222,70 @@ public class StateManager : MonoBehaviour
         return _currentState.Name();
     }
     #endregion
+
+    /// <summary>
+    /// Set Animator parameter by current State
+    /// </summary>
+    private void SyncAnimatorWithState(BaseState state)
+    {
+        if(_animator == null)
+        {
+            return;
+        }
+
+        string name = state.Name();
+
+        //Default Initialize
+        _animator.SetFloat("Speed", 0.0f);
+        _animator.ResetTrigger("Attack");
+        _animator.SetBool("IsDead", false);
+
+        switch (name)
+        {
+            case "Idle":
+                //nothing at Idle
+                break;
+            case "Chase":
+                _animator.SetFloat("Speed", 1.0f);//To Run at BlendTree
+                break;
+            case "Search":
+                _animator.SetFloat("Speed", 0.5f);//slowly
+                break;
+            case "Attack":
+                //Trigger
+                break;
+            case "Dead":
+                _animator.SetBool("IsDead", true);
+                break;
+        }
+    }
+
+    public void SetAnimationTrigger(string triggerName)
+    {
+        if(_animator == null)
+        {
+            return;
+        }
+        _animator.SetTrigger(triggerName);
+    }
+
+    //0: not playing, 0~1: playing, 1<: end
+    public float GetAnimationTime(string animationName)
+    {
+        var info = _animator.GetCurrentAnimatorStateInfo(0);
+        if (!info.IsName(animationName))
+        {
+            return -1;
+        }
+
+        return info.normalizedTime;
+    }
+
+    public void KillEnemy()
+    {
+        if (_health.DestroyOnDeath)
+        {
+            Destroy(gameObject);
+        }
+    }
 }

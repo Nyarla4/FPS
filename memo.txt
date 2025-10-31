@@ -49,3 +49,7 @@ First Person Shooter
 		이름은 클래스 이름과 동일
 		여러개 만들 수 있다(단, 매개변수는 달라야한다)
 	유니티에서 Monobehaviour를 상속하지 않은 순수 C# 클래스는 생성자를 호출해야 객체 생성 및 사용 가능
+1031
+	Animator
+	단일 Parameter로 애니메이션 변경 처리
+	=>MotionBlendTree

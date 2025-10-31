@@ -53,7 +53,11 @@ public class Health : MonoBehaviour, IDamageable
 
             if (DestroyOnDeath)
             {
-                Destroy(gameObject);
+                var animator = GetComponentInChildren<Animator>();
+                if (animator == null)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
     }

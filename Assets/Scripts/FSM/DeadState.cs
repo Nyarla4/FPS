@@ -27,6 +27,10 @@ public class DeadState : BaseState
 
     public override void OnUpdate(float dt)
     {
+        if (_context.GetAnimationTime("Die") >= 1.0f)
+        {
+            _context.KillEnemy();
+        }
         //죽은 상태에서는 아무 행동도 하지 않음
     }
 
