@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour
     private float _lastJumpPressTime;//마지막 점프입력시각
 
     private LocomotionFeed _feed;
+
+    [SerializeField] private Animator _animator;
+
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -64,6 +67,11 @@ public class PlayerController : MonoBehaviour
         {
             move = Stablillizer.ProjectOnGround(move, _controller, this);
             move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
+        }
+
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", _currentSpeed);
         }
 
         _controller.Move(move * dt);

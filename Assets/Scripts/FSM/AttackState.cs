@@ -38,6 +38,9 @@ public class AttackState : BaseState
             }
         }
 
+        //rhdrur doslapdltus wlsgodwnd(공격 애니메이션 진행중)
+        bool duringAttack = _context.GetAnimationTime("Punch") <= 1.0f && _context.GetAnimationTime("Punch") >= 0.0f;
+
         //시야 확인 + LastKnownPos 갱신
         bool seen = false;
         Vector3 seenPos = Vector3.zero;
@@ -51,18 +54,21 @@ public class AttackState : BaseState
             }
         }
 
-        //사거리 밖일 경우 => Chase로 전환
-        if (_context.DistanceToPlayer() > _context.AttackRange)
-        {
-            _context.RequestStateChange(_context.Chase);
-            return;
-        }
+        if (!duringAttack)
+        {//rhdrur doslapdltusdl wlsgodwnddl dkslf Eoaks State wjsghks cjfl(공격 애니메이션이 진행중이 아닌 때만 State 전환 처리)
+            //사거리 밖일 경우 => Chase로 전환
+            if (_context.DistanceToPlayer() > _context.AttackRange)
+            {
+                _context.RequestStateChange(_context.Chase);
+                return;
+            }
 
-        //시야를 상실했을 경우 => Search
-        if (!seen)
-        {
-            _context.RequestStateChange(_context.Search);
-            return;
+            //시야를 상실했을 경우 => Search
+            if (!seen)
+            {
+                _context.RequestStateChange(_context.Search);
+                return;
+            }
         }
 
         //공격 쿨다운 감소
@@ -75,7 +81,7 @@ public class AttackState : BaseState
         if (_context.AttackTimer <= 0.0f)
         {
             _context.SetAnimationTrigger("Attack");
-            DoAttack();
+            //DoAttack();
             _context.AttackTimer = _context.AttackCooldown;
         }
 
@@ -142,5 +148,14 @@ public class AttackState : BaseState
             default:
                 break;
         }
+    }
+
+    public void TryAttack()
+    {
+        if (_context.DistanceToPlayer() > _context.AttackRange)
+        {
+            return;
+        }
+        DoAttack();
     }
 }

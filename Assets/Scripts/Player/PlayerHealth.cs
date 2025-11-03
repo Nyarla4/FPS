@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 /// <summary>
 /// 플레이어의 체력 관리
@@ -13,9 +14,13 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private float _currentHealth; // 현재 체력
     public float CurrentHealth => _currentHealth;
 
+    [SerializeField] private Slider _healthSlider;
     private void Awake()
     {
         _currentHealth = _maxHealth;
+        _healthSlider.minValue = 0;
+        _healthSlider.maxValue = _maxHealth;
+        _healthSlider.value = _maxHealth;
     }
 
     void Update()
@@ -29,6 +34,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         Debug.Log($"player attacked {damage} damage");
 
         _currentHealth -= damage;
+        _healthSlider.value = _currentHealth;
 
         if (_currentHealth <= 0.0f)
         {

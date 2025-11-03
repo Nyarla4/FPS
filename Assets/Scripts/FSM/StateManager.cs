@@ -49,6 +49,8 @@ public class StateManager : MonoBehaviour
 
     [SerializeField] private Animator _animator;
 
+    //State Check
+    [SerializeField] private FSMStates _visualizeState;
     private void Awake()
     {
         if (_controller == null)
@@ -151,6 +153,25 @@ public class StateManager : MonoBehaviour
         if (next == null)
         {
             return;
+        }
+
+        switch (next.Name())
+        {
+            case "Idle":
+                _visualizeState = FSMStates.Idle;
+                break;
+            case "Chase":
+                _visualizeState = FSMStates.Chase;
+                break;
+            case "Search":
+                _visualizeState = FSMStates.Search;
+                break;
+            case "Attack":
+                _visualizeState = FSMStates.Attack;
+                break;
+            case "Dead":
+                _visualizeState = FSMStates.Dead;
+                break;
         }
 
         if (_currentState != null)
@@ -287,5 +308,14 @@ public class StateManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public enum FSMStates
+    {
+        Idle,
+        Chase,
+        Search,
+        Attack,
+        Dead//이건 필요한지 모르겠다
     }
 }

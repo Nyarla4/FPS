@@ -39,6 +39,7 @@ public class IdleState : BaseState
             if (_context.Senses.CanSeeTarget(out seenPos))
             {
                 seen = true;
+                Debug.Log(seenPos);
             }
         }
         if (seen)
