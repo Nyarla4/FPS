@@ -15,7 +15,6 @@ public class WeaponInput : MonoBehaviour
     private bool _adsHeld;//우클릭 누름
     private bool _reloadPressed;//재장전 눌린 프레임
 
-    [SerializeField] private Animator _animator;
     private void Update()
     {
         if (Controller == null)
@@ -70,10 +69,6 @@ public class WeaponInput : MonoBehaviour
         if (context.performed)
         {
             _reloadPressed = true;
-            if ( _animator != null)
-            {
-                _animator.SetTrigger("Reload");
-            }
         }
     }
 }

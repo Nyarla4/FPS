@@ -9,12 +9,15 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] float _maxHealth = 100.0f; // 최대체력
+    public float MaxHealth => _maxHealth;
     public UnityEvent OnDeath; // 사망 이벤트(사운드나 애니메이션 호출용)
 
     private float _currentHealth; // 현재 체력
     public float CurrentHealth => _currentHealth;
 
     [SerializeField] private Slider _healthSlider;
+
+    public UnityEvent<float> OnDamaged;//입은 대미지량 전달
     private void Awake()
     {
         _currentHealth = _maxHealth;
@@ -34,7 +37,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         Debug.Log($"player attacked {damage} damage");
 
         _currentHealth -= damage;
+
         _healthSlider.value = _currentHealth;
+        OnDamaged?.Invoke(damage);//피격 이벤트
 
         if (_currentHealth <= 0.0f)
         {
@@ -43,4 +48,18 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary>
+    /// 현재 체력을 0~1 사이의 값으로 반환
+    /// 현재 체력 / 최대 체력
+    /// </summary>
+    /// <returns></returns>
+    public float GetHealthRatio()
+    {
+        if (_maxHealth <= 0.0f)
+        {
+            return 0.0f;
+        }
+
+        return Mathf.Clamp01(_currentHealth / _maxHealth);
+    }
 }

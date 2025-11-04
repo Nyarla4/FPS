@@ -84,10 +84,11 @@ MonoBehaviour:
   OcclusionMask:
     serializedVersion: 2
     m_Bits: 64
-  ExplosionVfxPrefab: {fileID: 0}
+  ExplosionVfxPrefab: {fileID: 6374897667915035744, guid: bb1a52e9839ecf341b2a6cec13f2e1f3, type: 3}
   AudioSource: {fileID: 0}
   ExplosionClip: {fileID: 0}
   VfxUpOffset: 0.1
+  _staus: 0
 --- !u!135 &8255444746668731321
 SphereCollider:
   m_ObjectHideFlags: 0

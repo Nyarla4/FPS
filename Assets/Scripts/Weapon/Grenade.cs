@@ -67,6 +67,7 @@ public class Grenade : MonoBehaviour
         if (ExplosionVfxPrefab != null)
         {
             GameObject vfx = Instantiate(ExplosionVfxPrefab, transform.position + Vector3.up * VfxUpOffset, Quaternion.identity);
+            Destroy(vfx, 1f);
         }
         if (AudioSource != null)
         {

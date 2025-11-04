@@ -70,7 +70,7 @@ public class FootstepRouter : MonoBehaviour
         // 사운드 재생, 파티클, 카메라 진동
         PlayFootstepAudio(type);
         SpawnFootstepVfx(type, point, normal);
-        PulseCameraImpulse();
+        //PulseCameraImpulse();
     }
 
     private void PlayFootstepAudio(SurfaceType type)

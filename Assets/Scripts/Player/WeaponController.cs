@@ -46,6 +46,7 @@ public class WeaponController : MonoBehaviour
     public WeaponProjectileLauncher Launcher;//총알 Prefab 발사를 위한 참조용
     public bool UseBulletPrefab;
 
+    [SerializeField] private Animator _animator;
     private void Start()
     {
         _ammoInMag = Gun.MagSize; // 시작 시 가득 장전.
@@ -189,7 +190,10 @@ public class WeaponController : MonoBehaviour
         _isReloading = true;
 
         // (선택) 재장전 사운드/애니메이션 훅.
-        // audioSource.PlayOneShot(reloadSfx);
+        if (_animator != null)
+        {
+            _animator.SetTrigger("Reload");
+        }
 
         yield return new WaitForSeconds(Gun.ReloadTime);
 
@@ -310,6 +314,10 @@ public class WeaponController : MonoBehaviour
     {
         if (MuzzleFlash != null)
         {
+            if (!MuzzleFlash.gameObject.activeSelf)
+            {
+                MuzzleFlash.gameObject.SetActive(true);
+            }
             MuzzleFlash.Play();
         }
     }
@@ -385,5 +393,12 @@ public class WeaponController : MonoBehaviour
         {   //남은 탄량 표시
             AmmoHud.SetAmmo(_ammoInMag, Gun.ReserveAmmo);
         }
+    }
+
+    [ContextMenu("탄약 보충")]
+    private void GetNewAmmo()
+    {
+        Gun.ReserveAmmo = 90;
+        UpdateAmmoHud();
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TempGun
   m_EditorClassIdentifier: 
   MagSize: 30
-  ReserveAmmo: 90
+  ReserveAmmo: 30
   ReloadTime: 1.9
   ChamberedRound: 1
   FireRate: 10
