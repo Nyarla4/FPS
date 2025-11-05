@@ -11,4 +11,12 @@ public class AnimationEventReceiver : MonoBehaviour
             _stateManager.Attack.TryAttack();
         }
     }
+
+    public void OnShoot()
+    {
+        if (_stateManager != null && _stateManager.RangedAttack != null)
+        {
+            _stateManager.RangedAttack.TryShoot();
+        }
+    }
 }

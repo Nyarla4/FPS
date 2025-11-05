@@ -63,10 +63,21 @@ public class ChaseState : BaseState
 
         //공격 사거리 진입 시 => Attack
         float distToPlayer = _context.DistanceToPlayer();
-        if (distToPlayer <= _context.AttackRange)
+        if (_context.IsProjectile)
         {
-            _context.RequestStateChange(_context.Attack);
-            return;
+            if (distToPlayer <= _context.RangedAttackRange)
+            {
+                _context.RequestStateChange(_context.RangedAttack);
+                return;
+            }
+        }
+        else
+        {
+            if (distToPlayer <= _context.AttackRange)
+            {
+                _context.RequestStateChange(_context.Attack);
+                return;
+            }
         }
 
         //시야 상실 및 목표 지점 도달 시 => Search

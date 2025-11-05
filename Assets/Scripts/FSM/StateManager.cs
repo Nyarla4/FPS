@@ -22,35 +22,46 @@ public class StateManager : MonoBehaviour
     public float StoppingDistance = 1.2f;//정지 거리
     [SerializeField] private float _gravity = -20.0f;//중력 가속도(단위)
 
+    public bool IsProjectile = false;//원거리 여부
+
     [Header("Attack")]
     public float AttackRange = 1.8f;//공격 사거리
     public float AttackDamage = 10.0f;//공격 데미지
     public float AttackCooldown = 1.2f;//공격 쿨다운(초)
     public statusEffects AttackEffect;
 
+    [Header("RangedAttack")]
+    public float RangedAttackRange = 1.8f;//원거리 공격 사거리
+    public float RangedAttackDamage = 10.0f;//원거리 공격 데미지
+    public float RangedAttackCooldown = 1.2f;//원거리 공격 쿨다운(초)
+    public ProjectileBullet RangedBulletPrefab;//원거리 사격 탄환 프리팹
+    public Transform Muzzle;//탄 발사 위치
+    public bool ProjectileUseGravity;//탄 중력 적용 여부
+    public float ProjectileSpeed = 120.0f; //탄속(m/s)
+
     [Header("Search")]
     public float SearchDuration = 3.0f;//탐색 지속(초)
 
     [Header("Debug")]
     [SerializeField] private bool _drawForward = false;//전방 디버그 표시
+    [SerializeField] private FSMStates _visualizeState;//현재 State 표시
 
     [HideInInspector] public Vector3 LastKnownPos;//마지막 플레이어 위치
     [HideInInspector] public float AttackTimer;//공격 쿨다운 남은 시간
     [HideInInspector] public float SearchTimer;//탐색 남은 시간
 
-    [HideInInspector] public BaseState _currentState;//현재상태
-    [HideInInspector] public IdleState Idle;//Idle 상태 인스턴스
-    [HideInInspector] public ChaseState Chase;//Chase 상태 인스턴스
-    [HideInInspector] public AttackState Attack;//Attack 상태 인스턴스
-    [HideInInspector] public SearchState Search;//Search 상태 인스턴스
-    [HideInInspector] public DeadState Dead;//Dead 상태 인스턴스
+    public BaseState _currentState;//현재상태
+    public IdleState Idle;//Idle 상태 인스턴스
+    public ChaseState Chase;//Chase 상태 인스턴스
+    public AttackState Attack;//Attack 상태 인스턴스
+    public SearchState Search;//Search 상태 인스턴스
+    public DeadState Dead;//Dead 상태 인스턴스
+    public RangedAttackState RangedAttack;//RangedAttack 상태 인스턴스
 
     public StatusEffectHost StatusHost;
 
     [SerializeField] private Animator _animator;
 
-    //State Check
-    [SerializeField] private FSMStates _visualizeState;
     private void Awake()
     {
         if (_controller == null)
@@ -103,6 +114,7 @@ public class StateManager : MonoBehaviour
         Attack = new(this);
         Search = new(this);
         Dead = new(this);
+        RangedAttack = new(this);
 
         //현재 상태이상 위치로 초기화
         LastKnownPos = transform.position;
@@ -171,6 +183,9 @@ public class StateManager : MonoBehaviour
                 break;
             case "Dead":
                 _visualizeState = FSMStates.Dead;
+                break;
+            case "RangedAttack":
+                _visualizeState = FSMStates.RangedAttack;
                 break;
         }
 
@@ -245,7 +260,7 @@ public class StateManager : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// Set Animator parameter by current State
+    /// 현재 상태에 따라 애니메이터 파라미터 설정
     /// </summary>
     private void SyncAnimatorWithState(BaseState state)
     {
@@ -259,6 +274,7 @@ public class StateManager : MonoBehaviour
         //Default Initialize
         _animator.SetFloat("Speed", 0.0f);
         _animator.ResetTrigger("Attack");
+        _animator.ResetTrigger("Shoot");
         _animator.SetBool("IsDead", false);
 
         switch (name)
@@ -273,6 +289,7 @@ public class StateManager : MonoBehaviour
                 _animator.SetFloat("Speed", 0.5f);//slowly
                 break;
             case "Attack":
+            case "RangedAttack":
                 //Trigger
                 break;
             case "Dead":
@@ -290,7 +307,7 @@ public class StateManager : MonoBehaviour
         _animator.SetTrigger(triggerName);
     }
 
-    //0: not playing, 0~1: playing, 1<: end
+    //~0: 재생전, 0~1: 재생중, 1~0: 재생끝
     public float GetAnimationTime(string animationName)
     {
         var info = _animator.GetCurrentAnimatorStateInfo(0);
@@ -310,12 +327,43 @@ public class StateManager : MonoBehaviour
         }
     }
 
+    public Vector3 PlayerDirection()
+    {
+        if (Player == null)
+        {
+            return Vector3.zero;
+        }
+
+        return (Player.position - transform.position).normalized;
+    }
+
+    /// <summary>
+    /// 단발 발사
+    /// </summary>
+    public void FireOne()
+    {
+        if (RangedBulletPrefab == null || Muzzle == null)
+        {
+            return;
+        }
+
+        //발사 위치/시야 방향 계산
+        Vector3 origin = Muzzle.position;
+        Vector3 shotDir = PlayerDirection();
+
+        //총알 생성 후 초기 속도 설정
+        ProjectileBullet p = Instantiate(RangedBulletPrefab, origin, Quaternion.LookRotation(shotDir));
+        p.UseGravity = ProjectileUseGravity;
+        p.SetInitializeVelocity(shotDir * ProjectileSpeed);
+    }
+
     public enum FSMStates
     {
         Idle,
         Chase,
         Search,
         Attack,
-        Dead//이건 필요한지 모르겠다
+        Dead,//이건 필요한지 모르겠다
+        RangedAttack,
     }
 }
