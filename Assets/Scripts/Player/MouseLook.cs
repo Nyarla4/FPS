@@ -17,6 +17,8 @@ public class MouseLook : MonoBehaviour
     private float _pitch;
 
     public float SensitivityMultiplier = 1.0f;
+    [SerializeField] private PlayerHealth _playerHealth;
+    private bool _isAlive = true;
 
     private void Awake()
     {
@@ -32,10 +34,21 @@ public class MouseLook : MonoBehaviour
         // 커서 잠금
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        _isAlive = true;
+        if (_playerHealth != null)
+        {
+            _playerHealth.OnDeath.AddListener(OnDeath);
+        }
     }
 
     private void Update()
     {
+        if (!_isAlive)
+        {
+            return;
+        }
+
         float dt = Time.deltaTime;
 
         // Look 입력 반영(프레임 독립 보정)
@@ -77,5 +90,14 @@ public class MouseLook : MonoBehaviour
         float requested = Mathf.Clamp(adsMouseScale, 0.01f, 5.0f);
 
         SensitivityMultiplier = requested;
+    }
+
+    public void OnDeath()
+    {
+        _isAlive = false;
+
+        // 커서 잠금 해제
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

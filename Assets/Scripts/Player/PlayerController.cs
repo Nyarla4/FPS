@@ -1,9 +1,13 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private bool _FPSDead = true;//1인칭 사망 처리, false면 3인칭
+
     [Header("Move")]
     [SerializeField] private float _walkSpeed = 4.5f;//도보 속도
     [SerializeField] private float _sprintSpeed = 7.5f;//질주 속도
@@ -37,7 +41,11 @@ public class PlayerController : MonoBehaviour
 
     private LocomotionFeed _feed;
 
+    [SerializeField] private Animator _gunAnimator;
     [SerializeField] private Animator _animator;
+    [SerializeField] private PlayerHealth _playerHealth;
+    private bool _isAlive = true;
+    [SerializeField] private Camera _camera;
 
     private void Awake()
     {
@@ -51,10 +59,21 @@ public class PlayerController : MonoBehaviour
         {
             _feed = GetComponent<LocomotionFeed>();
         }
+
+        _isAlive = true;
+        if (_playerHealth != null)
+        {
+            _playerHealth.OnDeath.AddListener(OnDeath);
+        }
     }
 
     void Update()
     {
+        if (!_isAlive)
+        {
+            return;
+        }
+        
         float dt = Time.deltaTime;
         UpdateGround();
         UpdateHorizontalSpeed(dt);
@@ -69,6 +88,10 @@ public class PlayerController : MonoBehaviour
             move = Stablillizer.ApplyStepSmoothing(move, _controller, this);
         }
 
+        if (_gunAnimator != null)
+        {
+            _gunAnimator.SetFloat("Speed", _currentSpeed);
+        }
         if (_animator != null)
         {
             _animator.SetFloat("Speed", _currentSpeed);
@@ -268,5 +291,102 @@ public class PlayerController : MonoBehaviour
         //최종 이동 속도(m/s)
         Vector3 move = new Vector3(horizontal.x, _velocity.y, horizontal.z);
         return move;
+    }
+
+    private void OnDeath()
+    {
+        _isAlive = false;
+        _controller.Move(Vector3.zero);
+        
+        if(_camera.TryGetComponent<CameraEffectsMixer>(out var mixer))
+        {
+            mixer.enabled = false;
+        }
+
+        if (_gunAnimator != null)
+        {
+            _gunAnimator.SetFloat("Speed", 0f);
+        }
+
+        if (_animator != null)
+        {
+            _animator.SetTrigger("Dead");
+        }
+
+        if (_FPSDead)
+        {
+            StartCoroutine(FPSDown());
+        }
+        else
+        {
+            StartCoroutine(TPSDown());
+        }
+    }
+
+    IEnumerator FPSDown()
+    {
+        var currentRotX = 360.0f;
+        var goalRotX = 270f;
+        var fallSpeed = -10f;
+        //앞으로 쓰러트리려면 0,90,10,< 으로
+
+        float dt = Time.deltaTime;
+        while (currentRotX > goalRotX)
+        {
+            float next = currentRotX;
+            float stepDown = fallSpeed * dt;
+            next += stepDown;
+
+            Vector3 rot = transform.eulerAngles;
+            rot.x = next;
+
+            transform.rotation = Quaternion.Euler(rot);
+
+            yield return null;
+            currentRotX = transform.eulerAngles.x;
+        }
+        Vector3 finalRot = transform.eulerAngles;
+        finalRot.x = goalRotX;
+
+        transform.rotation = Quaternion.Euler(finalRot);
+    }
+
+    IEnumerator TPSDown()
+    {
+        var currentRotX = 360.0f;
+        var goalRotX = 270f;
+        var fallSpeed = -10f;
+        //앞으로 쓰러트리려면 0,90,10,< 으로
+        _camera.transform.localPosition = new Vector3(0f, 1f, -1f);
+        _camera.transform.localRotation = Quaternion.Euler(new Vector3(25f, 0f, 0f));
+        _animator.transform.localPosition = Vector3.forward * -0.5f;
+
+        float dt = Time.deltaTime;
+        while (currentRotX > goalRotX)
+        {
+            float next = currentRotX;
+            float stepDown = fallSpeed * dt;
+            next += stepDown;
+
+            Vector3 rot = transform.eulerAngles;
+            rot.x = next;
+            Vector3 camRot = Vector3.right * -next;
+
+            transform.rotation = Quaternion.Euler(rot);
+            _camera.transform.parent.localRotation = Quaternion.Euler(camRot);
+            _animator.transform.localRotation = Quaternion.Euler(camRot);
+            _animator.transform.localPosition = Vector3.forward * -0.5f;
+
+            yield return null;
+            currentRotX = transform.eulerAngles.x;
+        }
+        Vector3 finalRot = transform.eulerAngles;
+        finalRot.x = goalRotX;
+        Vector3 finalCamRot = Vector3.right * -goalRotX;
+
+        transform.rotation = Quaternion.Euler(finalRot);
+        _camera.transform.parent.localRotation = Quaternion.Euler(finalCamRot);
+        _animator.transform.localRotation = Quaternion.Euler(finalCamRot);
+        _animator.transform.localPosition = Vector3.forward * -0.5f;
     }
 }

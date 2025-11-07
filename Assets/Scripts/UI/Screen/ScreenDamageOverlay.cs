@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -172,6 +173,46 @@ public class ScreenDamageOverlay : MonoBehaviour
         if (_targetAlpha > MaxAlpha)
         {
             _targetAlpha = MaxAlpha;
+        }
+    }
+
+    public void DeadScreen()
+    {
+        //화면 초기화
+        if (OverlayImage != null)
+        {
+            OverlayImage.color = OverlayColor;
+        }
+        if (CanvasGroup != null)
+        {
+            CanvasGroup.alpha = 0.0f;
+        }
+        _targetAlpha = 0.0f;
+        _pulseTimer = 0.0f;
+
+        StartCoroutine(ScreenToRed());
+    }
+
+    IEnumerator ScreenToRed()
+    {
+        var currentAlpha = 0.0f;
+        var dt = Time.deltaTime;
+        while(currentAlpha < MaxAlpha)
+        {
+            currentAlpha = CanvasGroup.alpha;
+            float next = currentAlpha;
+            float stepDown = FadeOutSpeed * dt;
+            next = Mathf.MoveTowards(currentAlpha, MaxAlpha, stepDown);
+            next = Mathf.Clamp(next, 0.0f, MaxAlpha);
+            if (CanvasGroup != null)
+            {
+                CanvasGroup.alpha = next;
+            }
+            yield return null;
+        }
+        if (CanvasGroup != null)
+        {
+            CanvasGroup.alpha = MaxAlpha;
         }
     }
 }

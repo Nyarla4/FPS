@@ -46,7 +46,11 @@ public class WeaponController : MonoBehaviour
     public WeaponProjectileLauncher Launcher;//총알 Prefab 발사를 위한 참조용
     public bool UseBulletPrefab;
 
+    [SerializeField] private Animator _gunAnimator;
     [SerializeField] private Animator _animator;
+    [SerializeField] private PlayerHealth _playerHealth;
+    private bool _isAlive = true;
+
     private void Start()
     {
         _ammoInMag = Gun.MagSize; // 시작 시 가득 장전.
@@ -57,10 +61,21 @@ public class WeaponController : MonoBehaviour
         }
         //ui 초기화
         UpdateAmmoHud();
+
+        _isAlive = true;
+        if (_playerHealth != null)
+        {
+            _playerHealth.OnDeath.AddListener(() => { _isAlive = false; });
+        }
     }
 
     private void Update()
     {
+        if (!_isAlive)
+        {
+            return;
+        }
+
         float dt = Time.deltaTime;
 
         // 1) FOV(ADS) 전환.
@@ -94,6 +109,7 @@ public class WeaponController : MonoBehaviour
         // 4) 발사 처리(자동사격: 버튼 유지 시 연사)
         if (_fireHeld)
         {
+            _animator.SetTrigger("Shoot");
             TryFire();
             //if(Launcher != null && UseBulletPrefab)
             //{
@@ -190,8 +206,9 @@ public class WeaponController : MonoBehaviour
         _isReloading = true;
 
         // (선택) 재장전 사운드/애니메이션 훅.
-        if (_animator != null)
+        if (_gunAnimator != null)
         {
+            _gunAnimator.SetTrigger("Reload");
             _animator.SetTrigger("Reload");
         }
 

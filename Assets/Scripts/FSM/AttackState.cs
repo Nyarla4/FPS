@@ -56,6 +56,7 @@ public class AttackState : BaseState
 
         if (!duringAttack)
         {//공격 애니메이션이 진행중이 아닌 때만 State 전환 처리
+            
             //사거리 밖일 경우 => Chase로 전환
             if (_context.DistanceToPlayer() > _context.AttackRange)
             {

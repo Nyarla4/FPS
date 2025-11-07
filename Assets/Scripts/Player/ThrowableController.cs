@@ -23,6 +23,7 @@ public class ThrowableController : MonoBehaviour
     private bool _charging; //충전 중 여부
     private float _charge; //0~1 사이값으로 충전 정도
     private bool _fireRequested; //던지기 요청 플래그
+    [SerializeField] private Animator _animator;
 
     void Update()
     {
@@ -68,6 +69,7 @@ public class ThrowableController : MonoBehaviour
             return;
         }
 
+        _animator.SetTrigger("Throw");
         //카메라 위치/방향
         Vector3 origin = Hand != null ? Hand.position : PlayerCamera.transform.position;
         Vector3 dir = PlayerCamera.transform.forward;

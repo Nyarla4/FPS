@@ -77,6 +77,14 @@ public class EnemySenses : MonoBehaviour
                     Debug.DrawLine(Eye.position, hit.point, new Color(0.5f, 1.0f, 0.5f), 0.1f);
                 }
 
+                if(h.root.TryGetComponent<PlayerHealth>(out var hp))
+                {//죽었으면 못찾은걸로 처리
+                    if(hp.CurrentHealth <= 0)
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
             else

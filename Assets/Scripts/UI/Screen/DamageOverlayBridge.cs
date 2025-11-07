@@ -26,6 +26,7 @@ public class DamageOverlayBridge : MonoBehaviour
         if (PlayerHealth != null)
         {
             PlayerHealth.OnDamaged.AddListener(OnPlayerDamaged);
+            PlayerHealth.OnDeath.AddListener(OnPlayerDied);
         }
     }
 
@@ -34,6 +35,7 @@ public class DamageOverlayBridge : MonoBehaviour
         if (PlayerHealth != null)
         {
             PlayerHealth.OnDamaged.RemoveListener(OnPlayerDamaged);
+            PlayerHealth.OnDeath.RemoveListener(OnPlayerDied);
         }
     }
 
@@ -58,5 +60,15 @@ public class DamageOverlayBridge : MonoBehaviour
         }
 
         ScreenDamageOverlay.Instance.PlayDamageFlash(amount, maxHp);
+    }
+
+    private void OnPlayerDied()
+    {
+        if (ScreenDamageOverlay.Instance == null)
+        {
+            return;
+        }
+
+        ScreenDamageOverlay.Instance.DeadScreen();
     }
 }
