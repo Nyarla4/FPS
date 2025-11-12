@@ -275,7 +275,7 @@ public class StateManager : MonoBehaviour
         _animator.SetFloat("Speed", 0.0f);
         _animator.ResetTrigger("Attack");
         _animator.ResetTrigger("Shoot");
-        _animator.SetBool("IsDead", false);
+        _animator.ResetTrigger("IsDead");
 
         switch (name)
         {
@@ -293,7 +293,7 @@ public class StateManager : MonoBehaviour
                 //Trigger
                 break;
             case "Dead":
-                _animator.SetBool("IsDead", true);
+                _animator.SetTrigger("IsDead");
                 break;
         }
     }
