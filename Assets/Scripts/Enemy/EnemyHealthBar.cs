@@ -6,7 +6,7 @@ public class EnemyHealthBar : MonoBehaviour
     [SerializeField] private Slider _hpSlider;
     [SerializeField] private Health _health;
     [SerializeField] private Camera _cam;
-    [SerializeField] private Vector3 _offSet = new Vector3(0.0f, 2.0f, 0.0f);
+    [SerializeField] private Vector3 _offSet = new Vector3(0.0f, 1.0f, 0.0f);
     [SerializeField] private Transform _headTrans;
     private void Awake()
     {

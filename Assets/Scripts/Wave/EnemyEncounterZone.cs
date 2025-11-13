@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Resources;
 using UnityEngine;
-using static UnityEngine.Rendering.STP;
+using UnityEngine.Events;
 
 /// <summary>
 /// 조건: 플레이어가 트리거 진입 시
@@ -40,6 +39,16 @@ public class EnemyEncounterZone : MonoBehaviour
     private List<RuntimeWaveEntryState> _entryStates = new();
 
     private Collider _zoneCollider;//콜라이더 참조용
+
+    public UnityEvent OnEncounterStarted;//인카운터 시작
+    public UnityEvent OnEncounterCompleted;//인카운터 종료
+    public UnityEvent<int> OnWaveStarted;//웨이브 시작
+    public UnityEvent<int> OnEnemyAliveChanged;//살아있는 적 수 변경
+    public UnityEvent<int> OnEnemyTotalChanged;//웨이브 총 적 수 변경
+
+    public int CurrentWaveIndex => _currentWaveIndex;
+    public int AliveEnemies => _aliveEnemies;
+    public int TotalEnemiesThisWave => _totalToSpawnThisWave;
 
     void Update()
     {
@@ -96,12 +105,17 @@ public class EnemyEncounterZone : MonoBehaviour
 
         SetObjectActive(LockOnStart, true);
         SetObjectActive(UnlockOnEnd, false);
+
+        OnEncounterStarted?.Invoke();
+        OnWaveStarted?.Invoke(_currentWaveIndex);
+        OnEnemyAliveChanged?.Invoke(_aliveEnemies);
+        OnEnemyTotalChanged?.Invoke(_totalToSpawnThisWave);
     }
 
     /// <summary>
     /// 인카운트 종료 시
     /// </summary>
-    private void OnEncounterCompleted()
+    private void EncounterCompleted()
     {
         if (_endEncounterWhenDone)
         {
@@ -110,6 +124,8 @@ public class EnemyEncounterZone : MonoBehaviour
 
         SetObjectActive(LockOnStart, false);
         SetObjectActive(UnlockOnEnd, true);
+
+        OnEncounterCompleted?.Invoke();
     }
 
     private void SetObjectActive(GameObject[] objects, bool active)
@@ -132,6 +148,7 @@ public class EnemyEncounterZone : MonoBehaviour
         if(_aliveEnemies > 0)
         {
             --_aliveEnemies;
+            OnEnemyAliveChanged?.Invoke(_aliveEnemies);
         }
     }
 
@@ -155,15 +172,34 @@ public class EnemyEncounterZone : MonoBehaviour
             }
         }
 
+        //쿨타임 체크
+        if (_waveCooldownTimer <= 0f)
+        {
+            _waveCooldownTimer = wave.DelayAfterWave;
+            return;
+        }
+        if (_waveCooldownTimer > 0f)
+        {
+            _waveCooldownTimer -= Time.deltaTime;
+            if(_waveCooldownTimer > 0f)
+            {
+                return;
+            }
+        }
+
         ++_currentWaveIndex;//다음 웨이브로 전환
 
         if(_currentWaveIndex >= Waves.Length)
         {//총 웨이브 이상인 경우: 모든 웨이브 완료
-            OnEncounterCompleted();//인카운터 종료 함수 실행
+            EncounterCompleted();//인카운터 종료 함수 실행
         }
         else
         {
             SetupWaveRuntimeState();//다음 웨이브 세팅
+
+            OnWaveStarted?.Invoke(_currentWaveIndex);
+            OnEnemyAliveChanged?.Invoke(_aliveEnemies);
+            OnEnemyTotalChanged?.Invoke(_totalToSpawnThisWave);
         }
     }
 
@@ -252,6 +288,9 @@ public class EnemyEncounterZone : MonoBehaviour
                     state.NextSpawnTime = now + state.Config.SpawnInterval;//다음 스폰시간 처리
                     ++_aliveEnemies;//생존 적 증가
                     ++_totalSpawnedThisWave;//해당 웨이브에 스폰된 수량 추가
+
+                    OnEnemyAliveChanged?.Invoke(_aliveEnemies);
+                    OnEnemyTotalChanged?.Invoke(_totalToSpawnThisWave);
                 }
             }
         }
