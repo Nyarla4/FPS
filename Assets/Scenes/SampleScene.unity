@@ -3040,9 +3040,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c1806007917554d909d299add71e4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-  MaxSpawnCount: 10
-  PositionJitterRadius: 0.5
+  _maxSpawnCount: 10
+  _positionJitterRadius: 0.5
 --- !u!4 &725057928
 Transform:
   m_ObjectHideFlags: 0
@@ -3093,7 +3092,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 716, y: 221}
+  m_AnchoredPosition: {x: 810, y: -180}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &753452312
@@ -5108,33 +5107,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a867293101c093f4ca80bae8d2b28731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EncounterName: EncounterA
+  _encounterName: EncounterA
   _startOnPlayerEnter: 1
-  Waves:
-  - WaveName: wave1
+  _waves:
+  - WaveName: 
     Enemies:
-    - EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-      Count: 2
-      SpawnInterval: 1
-      SpawnPoint: {fileID: 1744073202}
-    - EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-      Count: 2
-      SpawnInterval: 2
-      SpawnPoint: {fileID: 2052674554}
-    WaitUntilAllDead: 1
-    DelayAfterWave: 1
-  - WaveName: wave2
-    Enemies:
-    - EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-      Count: 1
-      SpawnInterval: 0.5
-      SpawnPoint: {fileID: 1744073202}
-    - EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-      Count: 2
-      SpawnInterval: 0.2
-      SpawnPoint: {fileID: 725057927}
-    WaitUntilAllDead: 1
-    DelayAfterWave: 1
+    - EnemyPrefab: {fileID: 0}
+      Count: 0
+      SpawnInterval: 0
+      SpawnPoint: {fileID: 0}
+    - EnemyPrefab: {fileID: 0}
+      Count: 0
+      SpawnInterval: 0
+      SpawnPoint: {fileID: 0}
+    WaitUntilAllDead: 0
+    DelayAfterWave: 0
   _maxAllEnemies: 10
   _endEncounterWhenDone: 1
   LockOnStart: []
@@ -5591,8 +5578,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1082}
+  m_AnchoredPosition: {x: 0, y: 405}
+  m_SizeDelta: {x: 1920, y: 270}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1050095394
 CanvasGroup:
@@ -6811,7 +6798,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -10, y: 467}
+  m_AnchoredPosition: {x: 0.000030518, y: 85}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1396679741
@@ -13545,9 +13532,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c1806007917554d909d299add71e4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-  MaxSpawnCount: 10
-  PositionJitterRadius: 0.5
+  _maxSpawnCount: 10
+  _positionJitterRadius: 0.5
 --- !u!4 &1744073203
 Transform:
   m_ObjectHideFlags: 0
@@ -14865,9 +14851,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c1806007917554d909d299add71e4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2162184649508137406, guid: 3e02d843a0128184e8f726566e2e43a1, type: 3}
-  MaxSpawnCount: 10
-  PositionJitterRadius: 0.5
+  _maxSpawnCount: 10
+  _positionJitterRadius: 0.5
 --- !u!4 &2052674555
 Transform:
   m_ObjectHideFlags: 0

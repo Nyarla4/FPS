@@ -29,6 +29,12 @@ public class ChaseState : BaseState
 
     public override void OnUpdate(float dt)
     {
+        if (_context.RunDist > 0 && _context.StartRun())
+        {//도주거리가 있을 때 체력이 10%이하면 도주
+            _context.RequestStateChange(_context.Runaway);
+            return;
+        }
+
         float speedMul = 1.0f;
         if (_context.StatusHost != null)
         {
@@ -63,21 +69,36 @@ public class ChaseState : BaseState
 
         //공격 사거리 진입 시 => Attack
         float distToPlayer = _context.DistanceToPlayer();
-        if (_context.IsProjectile)
+        switch (_context.Pattern)
         {
-            if (distToPlayer <= _context.RangedAttackRange)
-            {
-                _context.RequestStateChange(_context.RangedAttack);
-                return;
-            }
-        }
-        else
-        {
-            if (distToPlayer <= _context.AttackRange)
-            {
-                _context.RequestStateChange(_context.Attack);
-                return;
-            }
+            case EnemyPattern.Hybrid:
+                if (distToPlayer <= _context.RangedAttackRange && distToPlayer > _context.AttackRange)
+                {
+                    _context.RequestStateChange(_context.RangedAttack);
+                    return;
+                }
+                else if (distToPlayer <= _context.AttackRange)
+                {
+                    _context.RequestStateChange(_context.Attack);
+                    return;
+                }
+                break;
+            case EnemyPattern.Melee:
+                if (distToPlayer <= _context.AttackRange)
+                {
+                    _context.RequestStateChange(_context.Attack);
+                    return;
+                }
+                break;
+            case EnemyPattern.Projectile:
+                if (distToPlayer <= _context.RangedAttackRange)
+                {
+                    _context.RequestStateChange(_context.RangedAttack);
+                    return;
+                }
+                break;
+            default:
+                break;
         }
 
         //시야 상실 및 목표 지점 도달 시 => Search

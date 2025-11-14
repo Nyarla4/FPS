@@ -14,7 +14,7 @@ public class Health : MonoBehaviour, IDamageable
 
     [Header("Optional Feedback")]
     public ParticleSystem HitVfxPrefab; //피격시 파티클
-    public AudioSource AudioSource;//피격시 사운드
+    public AudioSource AudioSource;//사운드 재생
     public AudioClip HurtClip;//피격시 효과음
 
     private float _currentHealth;//현재 체력
@@ -60,5 +60,12 @@ public class Health : MonoBehaviour, IDamageable
                 }
             }
         }
+    }
+
+    public void Healing(float amount)
+    {
+        //체력 증가 처리
+        float damage = Mathf.Max(amount, 0.0f);
+        _currentHealth += damage;
     }
 }

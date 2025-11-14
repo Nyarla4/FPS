@@ -1,5 +1,12 @@
 using UnityEngine;
 
+public enum EnemyPattern
+{
+    Hybrid,
+    Melee,
+    Projectile,
+}
+
 /// <summary>
 /// 적 FSM 시스템의 중심
 ///     행동 모듈(시야시스템, 체력시스템, 상태이상 등) 관리
@@ -9,6 +16,12 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class StateManager : MonoBehaviour
 {
+    [SerializeField] private EnemyPattern _enemyPattern;
+    public EnemyPattern Pattern => _enemyPattern;
+
+    [SerializeField] private float _runDist;
+    public float RunDist => _runDist;
+
     [Header("Modules")]
     public EnemySenses Senses;//시야 센서(보기/듣기/냄새)
     [SerializeField] private Health _health;//체력(현재 생명치)
@@ -21,8 +34,6 @@ public class StateManager : MonoBehaviour
     [SerializeField] private float _rotateSpeed = 12.0f;//회전 관련 속도
     public float StoppingDistance = 1.2f;//정지 거리
     [SerializeField] private float _gravity = -20.0f;//중력 가속도(단위)
-
-    public bool IsProjectile = false;//원거리 여부
 
     [Header("Attack")]
     public float AttackRange = 1.8f;//공격 사거리
@@ -44,7 +55,7 @@ public class StateManager : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool _drawForward = false;//전방 디버그 표시
-    [SerializeField] private FSMStates _visualizeState;//현재 State 표시
+    [SerializeField] private string _visualizeState;//현재 State 표시
 
     [HideInInspector] public Vector3 LastKnownPos;//마지막 플레이어 위치
     [HideInInspector] public float AttackTimer;//공격 쿨다운 남은 시간
@@ -57,11 +68,13 @@ public class StateManager : MonoBehaviour
     public SearchState Search;//Search 상태 인스턴스
     public DeadState Dead;//Dead 상태 인스턴스
     public RangedAttackState RangedAttack;//RangedAttack 상태 인스턴스
+    public RunawayState Runaway;//도주 상태 인스턴스
 
     public StatusEffectHost StatusHost;
 
     [SerializeField] private Animator _animator;
 
+    [SerializeField] private float _healed = 5f;
     private void Awake()
     {
         if (_controller == null)
@@ -115,6 +128,7 @@ public class StateManager : MonoBehaviour
         Search = new(this);
         Dead = new(this);
         RangedAttack = new(this);
+        Runaway = new(this);
 
         //현재 상태이상 위치로 초기화
         LastKnownPos = transform.position;
@@ -167,27 +181,7 @@ public class StateManager : MonoBehaviour
             return;
         }
 
-        switch (next.Name())
-        {
-            case "Idle":
-                _visualizeState = FSMStates.Idle;
-                break;
-            case "Chase":
-                _visualizeState = FSMStates.Chase;
-                break;
-            case "Search":
-                _visualizeState = FSMStates.Search;
-                break;
-            case "Attack":
-                _visualizeState = FSMStates.Attack;
-                break;
-            case "Dead":
-                _visualizeState = FSMStates.Dead;
-                break;
-            case "RangedAttack":
-                _visualizeState = FSMStates.RangedAttack;
-                break;
-        }
+        _visualizeState = next.Name();
 
         if (_currentState != null)
         {
@@ -210,6 +204,21 @@ public class StateManager : MonoBehaviour
         flatTarget.y = transform.position.y;
 
         Vector3 to = flatTarget - transform.position;//지면 기준 벡터
+        to.y = 0.0f;
+
+        if (to.sqrMagnitude > 0.0001f)
+        {
+            Quaternion look = Quaternion.LookRotation(to.normalized, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look, dt * _rotateSpeed);
+        }
+    }
+    
+    public void BackPosition(Vector3 target, float dt)
+    {
+        Vector3 flatTarget = target;
+        flatTarget.y = transform.position.y;
+
+        Vector3 to = transform.position - flatTarget;//지면 기준 벡터
         to.y = 0.0f;
 
         if (to.sqrMagnitude > 0.0001f)
@@ -280,13 +289,13 @@ public class StateManager : MonoBehaviour
         switch (name)
         {
             case "Idle":
-                //nothing at Idle
+                //Idle에서 아무것도 안함
                 break;
             case "Chase":
-                _animator.SetFloat("Speed", 1.0f);//To Run at BlendTree
+                _animator.SetFloat("Speed", 1.0f);//블렌드 트리에 맞게 달림
                 break;
             case "Search":
-                _animator.SetFloat("Speed", 0.5f);//slowly
+                _animator.SetFloat("Speed", 0.5f);//천천히
                 break;
             case "Attack":
             case "RangedAttack":
@@ -294,6 +303,9 @@ public class StateManager : MonoBehaviour
                 break;
             case "Dead":
                 _animator.SetTrigger("IsDead");
+                break;
+            case "Runaway":
+                _animator.SetFloat("Speed", 1.0f);//블렌드 트리에 맞게 일단 달림
                 break;
         }
     }
@@ -357,13 +369,37 @@ public class StateManager : MonoBehaviour
         p.SetInitializeVelocity(shotDir * ProjectileSpeed);
     }
 
-    public enum FSMStates
+    public float CurrentHealthPercent()
     {
-        Idle,
-        Chase,
-        Search,
-        Attack,
-        Dead,//이건 필요한지 모르겠다
-        RangedAttack,
+        if (_health == null || _health.MaxHealth == 0f)
+        {
+            return 0f;
+        }
+        return _health.CurrentHealth / _health.MaxHealth;
+    }
+
+    public bool StartRun()
+    {
+        return CurrentHealthPercent() <= 0.1f;
+    }
+
+    public bool EndRun()
+    {
+        return CurrentHealthPercent() >= 0.5f;
+    }
+
+    public bool RunEnough()
+    {
+        return DistanceToPlayer() >= RunDist;
+    }
+
+    public void Healing()
+    {
+        _health.Healing(_healed * Time.deltaTime);
+    }
+
+    public void SetAnimationIdle()
+    {
+        _animator.SetFloat("Speed", 0.0f);
     }
 }

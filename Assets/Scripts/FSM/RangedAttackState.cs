@@ -57,7 +57,20 @@ public class RangedAttackState : BaseState
 
         if (!duringAttack)
         {//사격 애니메이션이 진행중이 아닌 때만 State 전환 처리
-            
+
+            if (_context.RunDist > 0 && _context.StartRun())
+            {//도주거리가 있을 때 체력이 10%이하면 도주
+                _context.RequestStateChange(_context.Runaway);
+                return;
+            }
+
+            //복합형일 때 근접공격 범위 내인 경우 => Attack으로
+            if (_context.Pattern == EnemyPattern.Hybrid && _context.DistanceToPlayer() <= _context.AttackRange)
+            {
+                _context.RequestStateChange(_context.Attack);
+                return;
+            }
+
             //사거리 밖일 경우 => Chase로 전환
             if (_context.DistanceToPlayer() > _context.RangedAttackRange)
             {

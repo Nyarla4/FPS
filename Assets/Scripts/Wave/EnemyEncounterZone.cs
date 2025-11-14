@@ -9,11 +9,11 @@ using UnityEngine.Events;
 /// </summary>
 public class EnemyEncounterZone : MonoBehaviour
 {
-    public string EncounterName = "EncounterA";//교전명
+    [SerializeField] private string _encounterName = "EncounterA";//교전명
     [SerializeField] private bool _startOnPlayerEnter = true;//트리거 내에 진입시 자동 시작 처리
     private string _playerTag = "Player";
 
-    public WaveDefinition[] Waves;//순서대로 실행시킬 웨이브들
+    [SerializeField] private WaveDefinition[] _waves;//순서대로 실행시킬 웨이브들
     [SerializeField] private int _maxAllEnemies = 10;//동시 생존가능한 최대 적 수량
     [SerializeField] private bool _endEncounterWhenDone = true;//모든 웨이브 종료시 인카우터 자동 종료 여부
 
@@ -57,17 +57,17 @@ public class EnemyEncounterZone : MonoBehaviour
             return;
         }
 
-        if(Waves == null)
+        if(_waves == null)
         {//웨이브가 없는 경우
             return;
         }
 
-        if(_currentWaveIndex <0 || _currentWaveIndex >= Waves.Length)
+        if(_currentWaveIndex <0 || _currentWaveIndex >= _waves.Length)
         {//웨이브 인덱스 값이 맞지 않는 경우
             return;
         }
 
-        WaveDefinition wave = Waves[_currentWaveIndex];
+        WaveDefinition wave = _waves[_currentWaveIndex];
         UpdateWaveSpawning(wave);
         CheckWaveCompletion(wave);
     }
@@ -189,7 +189,7 @@ public class EnemyEncounterZone : MonoBehaviour
 
         ++_currentWaveIndex;//다음 웨이브로 전환
 
-        if(_currentWaveIndex >= Waves.Length)
+        if(_currentWaveIndex >= _waves.Length)
         {//총 웨이브 이상인 경우: 모든 웨이브 완료
             EncounterCompleted();//인카운터 종료 함수 실행
         }
@@ -214,12 +214,12 @@ public class EnemyEncounterZone : MonoBehaviour
         _totalSpawnedThisWave = 0;
         _totalToSpawnThisWave = 0;
 
-        if (Waves == null || _currentWaveIndex < 0 || _currentWaveIndex >= Waves.Length)
+        if (_waves == null || _currentWaveIndex < 0 || _currentWaveIndex >= _waves.Length)
         {//웨이브가 없거나 인덱스가 0미만이거나 인덱스가 웨이브를 넘으면 return
             return;
         }
 
-        WaveDefinition wave = Waves[_currentWaveIndex];
+        WaveDefinition wave = _waves[_currentWaveIndex];
         if(wave.Enemies == null)
         {//해당 웨이브에서 에너미에 대한 정보가 없는 경우 return
             return;
@@ -281,7 +281,7 @@ public class EnemyEncounterZone : MonoBehaviour
             RuntimeWaveEntryState state = _entryStates[entryIdx];
             if (state != null && state.SpawnedCount < state.Config.Count && now >= state.NextSpawnTime)
             {//null이거나 목표이상으로 스폰했거나 스폰시간이 덜 됐으면 패스
-                GameObject spawned = state.Config.SpawnPoint.SpawnOne(this);
+                GameObject spawned = state.Config.SpawnPoint.SpawnOne(this, state.Config.EnemyPrefab);
                 if (spawned != null)
                 {//무사 스폰이 되었을 경우
                     ++state.SpawnedCount;//state의 스폰 수량 증가
