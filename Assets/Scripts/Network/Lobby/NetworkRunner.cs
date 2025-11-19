@@ -5,65 +5,68 @@ using System.Net.Sockets;
 using UnityEngine;
 
 /// <summary>
-/// ¼­¹ö/Å¬¶óÀÌ¾ğÆ® ³×Æ®¿öÅ· ÃÑ°ı
-/// ·±Å¸ÀÓ ¸Å´ÏÀú
-///     -Host(¼­¹ö) ½ÃÀÛ/ÁßÁö
-///     -Client(Å¬¶ó) Á¢¼Ó/Á¾·á
-///     -Update¿¡¼­ ¼ö½Å Æú¸µ(Non-Blocking)
-///     -°£´Ü ÀÌº¥Æ®(Action)À¸·Î UI¿¡ ¾Ë¸² Ã³¸®
-/// ¶óÀÎ ÇÁ·ÎÅäÄİ(LineProtocol)À» ÀÌ¿ëÇØ ¹®ÀÚ¿­ ¸Ş½ÃÁö ¼Û¼ö½Å
+/// ï¿½ï¿½ï¿½ï¿½/Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½Æ®ï¿½ï¿½Å· ï¿½Ñ°ï¿½
+/// ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½Å´ï¿½ï¿½ï¿½
+///     -Host(ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
+///     -Client(Å¬ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
+///     -Updateï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(Non-Blocking)
+///     -ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®(Action)ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½Ë¸ï¿½ Ã³ï¿½ï¿½
+/// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(LineProtocol)ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ ï¿½Ş½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½ï¿½ï¿½
 /// </summary>
 public class NetworkRunner : MonoBehaviour
 {
-    public static NetworkRunner instance;//Àü¿ª Á¢±Ù(¾À¿¡ 1°³)
+    public static NetworkRunner instance;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½)
 
     [Header("Def")]
-    public int DefaultPort = 7777;//±âº» Æ÷Æ®
-    public float RoomBroadcastInterval = 0.5f;//¼­¹ö ·ë ¹æ¼Û ÁÖ±â(ÃÊ)
+    public int DefaultPort = 7777;//ï¿½âº» ï¿½ï¿½Æ®
+    public float RoomBroadcastInterval = 0.5f;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½(ï¿½ï¿½)
 
-    //¼­¹ö ÇÊµå
-    private TcpListener _serverListener;//¼­¹ö ¸®½º³Ê ¼ÒÄÏ
-    private bool _serverRunning;//¼­¹ö µ¿ÀÛ ¿©ºÎ
-    private Dictionary<int, ClientConn> _clients;//Á¢¼ÓÁßÀÎ Å¬¶óÀÌ¾ğÆ® ¸Ê
-    private int _nextClientId;//´ÙÀ½¿¡ ºÎ¿©ÇÒ Å¬¶óÀÌ¾ğÆ® ID
-    private float _roomBroadcastTimer;//·ë ÁÖ±â Å¸ÀÌ¸Ó
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½
+    private TcpListener _serverListener;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    private bool _serverRunning;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    private Dictionary<int, ClientConn> _clients;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½
+    private int _nextClientId;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ID
+    private float _roomBroadcastTimer;//ï¿½ï¿½ ï¿½Ö±ï¿½ Å¸ï¿½Ì¸ï¿½
 
-    //Å¬¶óÀÌ¾ğÆ® ÇÊµå
-    private TcpClient _client;//Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏ
-    private NetworkStream _clientStream;//Å¬¶óÀÌ¾ğÆ® ½ºÆ®¸²
-    private LineProtocol _clientLp;//Å¬¶óÀÌ¾ğÆ® ¶óÀÎ ÇÁ·ÎÅäÄİ
-    private bool _clientConnected;//Å¬¶óÀÌ¾ğÆ® Á¢¼Ó ¿©ºÎ
+    //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½Êµï¿½
+    private TcpClient _client;//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+    private NetworkStream _clientStream;//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½Æ®ï¿½ï¿½
+    private LineProtocol _clientLp;//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    private bool _clientConnected;//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    //¼­¹ö¸¦ ·ë¿¡ Ç¥½ÃÇÏ±â À§ÇÑ ÇÃ·¹ÀÌ¾î ¿£Æ®¸®(HOST´Â Å¬¶óÀÌ¾ğÆ® °âÁ÷ÇÔ)
-    private PlayerInfo _hostPlayer;//ID=0À¸·Î »ç¿ëÇÒ È£½ºÆ® ÇÃ·¹ÀÌ¾î
-    public bool IncludeHostInRoom = true;//È£½ºÆ®¸¦ ·ë ¸ñ·Ï¿¡ Æ÷ÇÔÇÒÁö ¿©ºÎ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ë¿¡ Ç¥ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½(HOSTï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+    private PlayerInfo _hostPlayer;//ID=0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½Æ® ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
+    public bool IncludeHostInRoom = true;//È£ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    //·Îºñ »óÅÂ(¼­¹ö Authoritative)
+    //ï¿½Îºï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ Authoritative)
     private class PlayerInfo
     {
-        public int Id;//°íÀ¯ ID
-        public string Name;//´Ğ³×ÀÓ
-        public bool Ready;//ÁØºñ ¿©ºÎ
+        public int Id;//ï¿½ï¿½ï¿½ï¿½ ID
+        public string Name;//ï¿½Ğ³ï¿½ï¿½ï¿½
+        public bool Ready;//ï¿½Øºï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
     private class ClientConn
     {
-        public int Id;//Å¬¶ó ID
-        public TcpClient Socket;//TCP ¼ÒÄÏ
-        public NetworkStream Stream;//½ºÆ®¸²
-        public LineProtocol Lp;//¶óÀÎ ÇÁ·ÎÅäÄİ
-        public PlayerInfo Info;//ÇÃ·¹ÀÌ¾î Á¤º¸
+        public int Id;//Å¬ï¿½ï¿½ ID
+        public TcpClient Socket;//TCP ï¿½ï¿½ï¿½ï¿½
+        public NetworkStream Stream;//ï¿½ï¿½Æ®ï¿½ï¿½
+        public LineProtocol Lp;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        public PlayerInfo Info;//ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
-    private Dictionary<int, PlayerInfo> _players; //¼­¹ö°¡ °ü¸®ÁßÀÎ ÇÃ·¹ÀÌ¾î ¸ñ·Ï
-    private List<int> _pendingRemoveClientIds = new();//Å¬¶óÀÌ¾ğÆ® Á¦°Å Áö¿¬ Ã³¸®¿ë(´ã¾Æ³õ°í ÃßÈÄ Á¦°Å)
+    private Dictionary<int, PlayerInfo> _players; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½
+    private List<int> _pendingRemoveClientIds = new();//Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 
-    //UI ¿¬µ¿ ÀÌº¥Æ®
-    public Action<string> OnStatus;//»óÅÂ ·Î±× Ãâ·Â
-    public Action<string> OnRoomText;//·ë ½º³À¼¦ ÅØ½ºÆ®
-    public Action<bool> OnHostModeChanged;//È£½ºÆ® ¿©ºÎ ¾Ë¸²
-    public Action<bool> OnClientConnectedChanged;//Å¬¶óÁ¢¼Ó ¿©ºÎ ¾Ë¸²
-    public Action OnStartSignal; //START ¼ö½Å ¾Ë¸²
+    //UI ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    public Action<string> OnStatus;//ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
+    public Action<string> OnRoomText;//ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ®
+    public Action<bool> OnHostModeChanged;//È£ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
+    public Action<bool> OnClientConnectedChanged;//Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
+    public Action OnStartSignal; //START ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
+
+    public Action<int, string, string> OnServerCommand;
+    public Action<string, string> OnClientCommand;
 
     private void Awake()
     {
@@ -80,11 +83,14 @@ public class NetworkRunner : MonoBehaviour
         _clients = new();
         _players = new();
         _nextClientId = 1;
+
+        // Runnerë¥¼ ì”¬ ì „í™˜ í›„ì—ë„ ìœ ì§€
+        DontDestroyOnLoad(gameObject);
     }
 
     void Update()
     {
-        //¼­¹ö ¼ö½Å/¼ö¶ô
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
         if (_serverRunning)
         {
             Server_AcceptPending();
@@ -92,20 +98,20 @@ public class NetworkRunner : MonoBehaviour
             Server_RoomBroadcastTick();
         }
 
-        //Å¬¶óÀÌ¾ğÆ® ¼ö½Å
+        //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
         if (_clientConnected)
         {
             Client_PoolReceive();
         }
     }
 
-    //¼­¹ö: ½ÃÀÛ/ÁßÁö Ã³¸®
+    //ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     public void HostStart(int port)
     {
         if (_serverRunning)
         {
             OnStatus?.Invoke("Server already running");
-            //¼­¹ö ÀÌ¹Ì µ¹¾Æ°¡´Â ÁßÀÌ¸é return
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ return
             return;
         }
 
@@ -117,7 +123,7 @@ public class NetworkRunner : MonoBehaviour
 
             _roomBroadcastTimer = 0.0f;
 
-            //Host¸¦ 0¹ø ID ÇÃ·¹ÀÌ¾î·Î µî·Ï Ã³¸®
+            //Hostï¿½ï¿½ 0ï¿½ï¿½ ID ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
             if (IncludeHostInRoom)
             {
                 _hostPlayer = new();
@@ -143,7 +149,7 @@ public class NetworkRunner : MonoBehaviour
     public void HostStop()
     {
         if (!_serverRunning)
-        {//½ÃÀÛµµ ¾ÈÇßÀ¸¸é Á¾·áµµ ¾ø´Ù
+        {//ï¿½ï¿½ï¿½Ûµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½áµµ ï¿½ï¿½ï¿½ï¿½
             return;
         }
 
@@ -164,7 +170,7 @@ public class NetworkRunner : MonoBehaviour
         try
         {
             _serverListener.Stop();
-            //¸®½º³Ê Á¤Áö·Î ´Ù¸¥ °Íµé ¾È¹Şµµ·Ï ²÷À½
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½Íµï¿½ ï¿½È¹Şµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
         catch
         {
@@ -177,14 +183,14 @@ public class NetworkRunner : MonoBehaviour
 
         OnStatus?.Invoke("Server stopped");
 
-        //¼­¹ö¸¦ ²ô¸é Å¬¶óµµ ²÷¾îÁö´Â »óÈ²ÀÌ ¸¹À¸¹Ç·Î Ãß°¡ Á¤¸®
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È²ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (_clientConnected)
         {
             ClientDisconnect();
         }
     }
 
-    //¼­¹ö: ¼ö¶ô/¼ö½Å/¹æ¼Û Ã³¸®
+    //ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     private void Server_AcceptPending()
     {
         if (_serverListener == null)
@@ -200,11 +206,11 @@ public class NetworkRunner : MonoBehaviour
 
         try
         {
-            //Å¬¶óÀÇ Á¢¼Ó ¹ŞÀº ºÎºĞ
+            //Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½
             TcpClient sock = _serverListener.AcceptTcpClient();
             sock.NoDelay = true;
 
-            //Á¢¼ÓµÈ Å¬¶ó¼¼ÆÃ
+            //ï¿½ï¿½ï¿½Óµï¿½ Å¬ï¿½ï¿½ï¿½ï¿½
             ClientConn cc = new();
             cc.Id = _nextClientId;
             _nextClientId++;
@@ -218,7 +224,7 @@ public class NetworkRunner : MonoBehaviour
             pi.Ready = false;
             cc.Info = pi;
 
-            //ÄÁÅ×ÀÌ³Ê¿¡ Ãß°¡
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ì³Ê¿ï¿½ ï¿½ß°ï¿½
             _clients.Add(cc.Id, cc);
             _players.Add(cc.Id, pi);
 
@@ -226,13 +232,13 @@ public class NetworkRunner : MonoBehaviour
         }
         catch (Exception e)
         {
-            //Á¢¼ÓÁß ¿À·ù¹ß»ı ½Ã
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß»ï¿½ ï¿½ï¿½
             OnStatus?.Invoke($"Accept failed: {e.Message}");
         }
     }
 
     /// <summary>
-    /// ¼­¹öÃø¿¡¼­ µ¥ÀÌÅÍ ¼ö½Å/Ã³¸®
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/Ã³ï¿½ï¿½
     /// </summary>
     private void Server_PollReceive()
     {
@@ -262,11 +268,11 @@ public class NetworkRunner : MonoBehaviour
                 Server_HandleLine(cc, line);
             }
 
-            //°£´ÜÇÑ ¿¬°á È®ÀÎ: ¼ÒÄÏ ´İÇû´ÂÁö Ã¼Å© ºÒ°¡ => ¿¹¿Ü ¹ß»ı ½Ã Á¦°Å ·ÎÁ÷À¸·Î Ã³¸®
-            //¡Ø¿©±â¼­´Â »ı·«
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¼Å© ï¿½Ò°ï¿½ => ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
+            //ï¿½Ø¿ï¿½ï¿½â¼­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
 
-        //·çÇÁ ÈÄ ÇÑ²¨¹ø¿¡ Á¦°Å Ã³¸®
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ñ²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
         if (_pendingRemoveClientIds != null && _pendingRemoveClientIds.Count > 0)
         {
             for (int i = 0; i < _pendingRemoveClientIds.Count; i++)
@@ -276,13 +282,13 @@ public class NetworkRunner : MonoBehaviour
             }
             _pendingRemoveClientIds.Clear();
 
-            //½ÇÁ¦ »èÁ¦ ¹İ¿µµÈ »óÅÂ¸¦ ÇÑ¹ø¸¸ ¹æ¼Û
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½İ¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½Ñ¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             Server_BroadcastRoom();
         }
     }
 
     /// <summary>
-    /// //UI¿¡¼­ ¼±ÅÃÇÑ Çàµ¿¿¡ µû¶ó ÇÔ¼ö Ã³¸®
+    /// //UIï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½àµ¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ Ã³ï¿½ï¿½
     /// </summary>
     private void Server_HandleLine(ClientConn cc, string line)
     {
@@ -291,7 +297,7 @@ public class NetworkRunner : MonoBehaviour
             return;
         }
 
-        //"CMD|payload" ÇüÅÂ
+        //"CMD|payload" ï¿½ï¿½ï¿½ï¿½
         int bar = line.IndexOf('|');
         string cmd;
         string payload;
@@ -308,9 +314,9 @@ public class NetworkRunner : MonoBehaviour
         }
 
         if (cmd == "JOIN")
-        {//JOIN ´­·¶À»¶§
+        {//JOIN ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-            //¿¬°á ¿äÃ»
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»
             if (!string.IsNullOrEmpty(payload))
             {
                 cc.Info.Name = payload;
@@ -322,7 +328,7 @@ public class NetworkRunner : MonoBehaviour
             Server_BroadcastRoom();
         }
         else if(cmd == "READY")
-        {//READY ´­·¶À»¶§
+        {//READY ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
             if(payload == "1")
             {
@@ -338,27 +344,30 @@ public class NetworkRunner : MonoBehaviour
             Server_BroadcastRoom();
         }
         else if (cmd == "LEAVE")
-        {//³ª°¬À»¶§
+        {//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-            //¿­°Å Áß ÄÃ·º¼Ç ¼öÁ¤ ¿¡·¯¸¦ ¸·±â À§ÇØ, Áï½Ã»èÁ¦ ¾Ê°í »èÁ¦ ´ë±â¿­¿¡ Ãß°¡
-            _pendingRemoveClientIds.Add(cc.Id);//»èÁ¦ÇÒ ÇÃ·¹ÀÌ¾î¸¦ ´ã¾Æ³õ´Â Ã³¸®
-            //·ë ¹æ¼ÛÀº ½ÇÁ¦ »èÁ¦ Àû¿ë ÈÄ 1¹ø¸¸(¾Æ·¡¿¡¼­ Ã³¸®)
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½â¿­ï¿½ï¿½ ï¿½ß°ï¿½
+            _pendingRemoveClientIds.Add(cc.Id);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
+            //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½ï¿½ï¿½(ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½)
         }
         else if( cmd =="START")
-        {//½ÃÀÛ ´­·¶À» ¶§
+        {//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 
-            //È£½ºÆ® Àü¿ëÀ¸·Î °¡Á¤(½Ç½À¿¡¼­´Â ¿¡µğÅÍ=È£½ºÆ® ¹öÆ°À¸·Î¸¸ Àü¼Û)
+            //È£ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½=È£ï¿½ï¿½Æ® ï¿½ï¿½Æ°ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½)
             Server_BroadcastLine("START");
             OnStatus?.Invoke("START broadcasted");
         }
         else
         {
+            // ë¡œë¹„ ì™¸ ì»¤ë§¨ë“œëŠ” ê²Œì„ ëª¨ë“ˆë¡œ ì „ë‹¬
+            OnServerCommand?.Invoke(cc.Id, cmd, payload);
+
             OnStatus?.Invoke($"Unknown cmd from {cc.Id}: {cmd}");
         }
     }
 
     /// <summary>
-    /// ¼­¹ö¿¡´Ù ÇÑ ÁÙ ¹æ¼Û Ã³¸®
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     /// </summary>
     private void Server_BroadcastLine(string line)
     {
@@ -378,7 +387,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ID¸¦ ¹Ş¾Æ¼­ ÇØ´ç ÇÃ·¹ÀÌ¾î¸¦ ÄÁÅ×ÀÌ³Ê¿¡¼­ »èÁ¦Ã³¸®
+    /// IDï¿½ï¿½ ï¿½Ş¾Æ¼ï¿½ ï¿½Ø´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ì³Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
     /// </summary>
     private void Server_RemoveClient(int id)
     {
@@ -405,12 +414,12 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇöÀç ¹æ »óÅÂ ¹æ¼Û
-    ///     ÁØºñ»óÅÂ, µé¾î°¡°Å³ª ³ª°£ »óÅÂ µî
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    ///     ï¿½Øºï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½î°¡ï¿½Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     /// </summary>
     private void Server_BroadcastRoom()
     {
-        // °£´Ü JSON ±¸¼º
+        // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½
         // {"players":[{"id":1,"name":"Alice","ready":true}, ...]}
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
         sb.Append("{\"players\":[");
@@ -435,7 +444,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ½Ã°£¸¶´Ù »óÅÂ Æ½ Ã³¸® ÈÄ ¹æ¼Û
+    /// ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Æ½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
     /// </summary>
     private void Server_RoomBroadcastTick()
     {
@@ -449,10 +458,10 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// Å¬¶óÀÌ¾ğÆ® Á¢¼Ó
+    /// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="address">ip</param>
-    /// <param name="port">Æ÷Æ®</param>
+    /// <param name="port">ï¿½ï¿½Æ®</param>
     public void ClientConnect(string address, int port)
     {
         if (_clientConnected == true)
@@ -481,7 +490,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö·Î ¼Û½Å
+    /// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Û½ï¿½
     /// </summary>
     public void ClientSendLine(string line)
     {
@@ -497,7 +506,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö·ÎºÎÅÍ ¼ö½Å
+    /// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     private void Client_PoolReceive()
     {
@@ -524,7 +533,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ¼ö½ÅÇÑ µ¥ÀÌÅÍ¸¦ µ¥ÀÌÅÍº°·Î ÅØ½ºÆ® Ã¢¿¡ Âï¾îÁÜ
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Íºï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® Ã¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     private void Client_HandleLine(string line)
     {
@@ -550,7 +559,7 @@ public class NetworkRunner : MonoBehaviour
 
         if (cmd == "ROOM")
         {
-            // UI ÅØ½ºÆ®·Î ±×´ë·Î º¸¿©ÁØ´Ù(ÆÄ½Ì »ı·« °¡´É)
+            // UI ï¿½Ø½ï¿½Æ®ï¿½ï¿½ ï¿½×´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø´ï¿½(ï¿½Ä½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
             if (OnRoomText != null)
             {
                 OnRoomText.Invoke(payload);
@@ -565,13 +574,15 @@ public class NetworkRunner : MonoBehaviour
         }
         else
         {
-            // ±âÅ¸ ¸Ş½ÃÁö´Â »óÅÂ ·Î±×·Î Ãâ·Â
+            OnClientCommand.Invoke(cmd, payload);
+
+            // ï¿½ï¿½Å¸ ï¿½Ş½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½
             OnStatus?.Invoke("SAYS: " + line);
         }
     }
 
     /// <summary>
-    /// Á¢¼Ó ²÷À»¶§ È£Ãâ
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
     /// </summary>
     public void ClientDisconnect()
     {
@@ -602,7 +613,7 @@ public class NetworkRunner : MonoBehaviour
     }
 
     /// <summary>
-    /// ¹®ÀÚ¿­ ´ëÃ¼ Ã³¸®
+    /// ï¿½ï¿½ï¿½Ú¿ï¿½ ï¿½ï¿½Ã¼ Ã³ï¿½ï¿½
     /// </summary>
     private string EscapeJson(string s)
     {
@@ -633,6 +644,9 @@ public class NetworkRunner : MonoBehaviour
 
         Server_BroadcastLine("START");
         OnStatus?.Invoke("START broadcasted by host.");
+
+        // í˜¸ìŠ¤íŠ¸ ìì‹ ì—ê²Œë„ ì¦‰ì‹œ START ì‹ í˜¸ ë°œìƒ (ì¤‘ìš”!)
+        OnStartSignal?.Invoke();
     }
 
     public void HostSetName(string name)
@@ -674,5 +688,58 @@ public class NetworkRunner : MonoBehaviour
 
         _hostPlayer.Ready = ready;
         Server_BroadcastRoom();
+    }
+
+    public void ServerBroadcastLinePublic(string line)
+    {
+        // 1) ë„¤íŠ¸ì›Œí¬ë¡œ í´ë¼ì´ì–¸íŠ¸ë“¤ì—ê²Œ ë°©ì†¡
+        if (_serverRunning == true)
+        {
+            Server_BroadcastLine(line);
+        }
+
+        // 2) í˜¸ìŠ¤íŠ¸(ì„œë²„) ë¡œì»¬ì—ë„ ê°™ì€ ë‚´ìš©ì„ ì „ë‹¬í•´ í˜¸ìŠ¤íŠ¸ í™”ë©´ì—ì„œë„ ì ìš©ë˜ê²Œ í•¨
+        //    (ClientGame.OnClientCommand -> ApplyStateJson ì´ í˜¸ì¶œë˜ë„ë¡)
+        int bar = line.IndexOf('|');
+        string cmd = bar >= 0 ? line.Substring(0, bar) : line;
+        string payload = bar >= 0 ? line.Substring(bar + 1) : string.Empty;
+
+        // STATE ì™¸ì—ë„ í•„ìš”í•˜ë©´ ë‹¤ë¥¸ ë©”ì‹œì§€ë„ ë¡œì»¬ ë°˜ì˜ ê°€ëŠ¥
+        if (cmd == "STATE")
+        {
+            OnClientCommand?.Invoke(cmd, payload);
+        }
+    }
+
+    // ì‹¤ì œ ì°¸ê°€ì idë¥¼ ë°˜í™˜
+    public List<int> GetCurrentPlayerIdsSnapshot()
+    {
+        List<int> ids = new List<int>();
+
+        // players ë”•ì…”ë„ˆë¦¬ëŠ”: id=0 (í˜¸ìŠ¤íŠ¸; includeHostInRoom==trueì¼ ë•Œ) + í´ë¼ë“¤(1..N)
+        if (_players != null)
+        {
+            foreach (var kv in _players)
+            {
+                ids.Add(kv.Key);
+            }
+        }
+
+        // ì •ë ¬ì€ ì„ íƒ ì‚¬í•­(ë³´ê¸° ì¢‹ê²Œ)
+        ids.Sort();
+
+        return ids;
+    }
+
+    public void ServerInjectCommand(int fromClientId, string cmd, string payload)
+    {
+        // ì„œë²„ê°€ ì¼œì ¸ ìˆì„ ë•Œ, ë„¤íŠ¸ì›Œí¬ ê²½ìœ  ì—†ì´
+        // ì„œë²„ ì½œë°±(onServerCommand)ì„ ì§ì ‘ í˜¸ì¶œí•´ ë¡œì»¬ ì…ë ¥ì„ ì£¼ì…í•œë‹¤.
+        if (_serverRunning == false)
+        {
+            return;
+        }
+
+        OnServerCommand?.Invoke(fromClientId, cmd, payload);
     }
 }
