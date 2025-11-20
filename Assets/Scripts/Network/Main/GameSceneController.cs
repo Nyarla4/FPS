@@ -62,7 +62,7 @@ public class GameSceneController : MonoBehaviour
             // (�ӽ� ��ƿ ���, ���ʿ� ������ getter�� �ִٸ� �װ� ���)
             //List<int> ids = NetworkUtil.GetCurrentPlayerIds(); // �ӽ� ��� ��� ���̸� ���� ��ü
             List<int> ids = NetworkRunner.instance.GetCurrentPlayerIdsSnapshot();
-            sg.SpawnPlayerInitial(ids);
+            sg.SpawnPlayersInitial(ids);
         }
 
         // 5) Ŭ�� ǥ�� ����: ����/Ŭ�� ��� STATE�� ���� ������ �� �� ClientGame ����
