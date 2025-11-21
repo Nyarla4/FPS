@@ -116,6 +116,14 @@ public class ClientGame : MonoBehaviour
             capsule.name = $"Avatar_{id}";
             capsule.transform.SetParent(AvatarsRoot, false);
             avatars.Add(id, capsule.transform);
+
+            //루트 처리
+            ServerGame sg = GetComponent<ServerGame>();
+            if (sg != null)
+            {
+                sg.SetRoot(id, capsule.transform);
+            }
+
             return capsule.transform;
         }
         else
@@ -123,6 +131,14 @@ public class ClientGame : MonoBehaviour
             GameObject go = GameObject.Instantiate(AvatarPrefab, AvatarsRoot);
             go.name = $"Avatar_{id}";
             avatars.Add(id, go.transform);
+
+            //루트 처리
+            ServerGame sg = GetComponent<ServerGame>();
+            if (sg != null)
+            {
+                sg.SetRoot(id, go.transform);
+            }
+
             return go.transform;
         }
     }
