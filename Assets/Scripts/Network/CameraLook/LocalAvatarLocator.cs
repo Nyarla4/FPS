@@ -2,20 +2,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// °£´Ü ÇïÆÛ: ÇöÀç Å¬¶óÀÌ¾ðÆ®(¶Ç´Â È£½ºÆ®)ÀÇ '³» ¾Æ¹ÙÅ¸' TransformÀ» Ã£¾Æ¼­ µ¹·ÁÁØ´Ù.
-/// µ¥¸ð ±âÁØÀ¸·Î ¾Æ¹ÙÅ¸ ÀÌ¸§ÀÌ "Avatar_{id}" ¶ó°í °¡Á¤.
-/// ½ÇÁ¦·Î´Â NetworkRunner¿¡ '³» id'¸¦ ¹ÝÈ¯ÇÏ´Â getter°¡ ÀÖÀ¸¸é ±×°É ¾²´Â °Ô °¡Àå ÁÁ´Ù.
+/// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®(ï¿½Ç´ï¿½ È£ï¿½ï¿½Æ®)ï¿½ï¿½ 'ï¿½ï¿½ ï¿½Æ¹ï¿½Å¸' Transformï¿½ï¿½ Ã£ï¿½Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø´ï¿½.
+/// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ¹ï¿½Å¸ ï¿½Ì¸ï¿½ï¿½ï¿½ "Avatar_{id}" ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+/// ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ NetworkRunnerï¿½ï¿½ 'ï¿½ï¿½ id'ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï´ï¿½ getterï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 /// </summary>
 public class LocalAvatarLocator : MonoBehaviour
 {
-    public int myId = 0;                      // È£½ºÆ®=0, Ã¹ Å¬¶ó=1 ...
-    public Transform avatarsRoot;             // ¾Æ¹ÙÅ¸µéÀÌ ¸ð¿©ÀÖ´Â ·çÆ®
+    public int myId = -1;                      // È£ï¿½ï¿½Æ®=0, Ã¹ Å¬ï¿½ï¿½=1 ...
+    public Transform avatarsRoot;             // ï¿½Æ¹ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½Æ®
 
     public Transform FindMyAvatar()
     {
         if (avatarsRoot == null)
         {
             return null;
+        }
+
+        if (myId < 0)
+        {
+            myId = NetworkRunner.instance.IsServerRunning() ? 0 : 1;
         }
 
         string targetName = $"Avatar_{myId}";

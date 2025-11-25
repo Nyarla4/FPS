@@ -1,23 +1,23 @@
 using UnityEngine;
 
 /// <summary>
-/// ÁÂÅ¬¸¯ ½Ã ¼­¹ö¿¡ FIRE ¸í·É ¼Û½Å
-///     ¼­¹ö°¡ sim.yaw/pitch·Î ÆÇÁ¤ => Ãß°¡ µ¥ÀÌÅÍ »ý·«
-///     ¹ß»ç ¿¬Ãâ(¸ÓÁñ/¹Ýµ¿/¼ÎÀÌÅ©)´Â ·ÎÄÃ¿¡¼­ Áï½Ã Àç»ý
+/// ï¿½ï¿½Å¬ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ FIRE ï¿½ï¿½ï¿½ ï¿½Û½ï¿½
+///     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ sim.yaw/pitchï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ => ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+///     ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½/ï¿½Ýµï¿½/ï¿½ï¿½ï¿½ï¿½Å©)ï¿½ï¿½ ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 /// </summary>
 public class InputSenderFire : MonoBehaviour
 {
-    public float LocalFireCooldown = 0.08f;//·ÎÄÃ ÇÇµå¹é Äð´Ù¿î(¼­¹ö Äð´Ù¿î°ú À¯»çÇÏ°Ô ÇÒ °Í)
+    public float LocalFireCooldown = 0.08f;//ï¿½ï¿½ï¿½ï¿½ ï¿½Çµï¿½ï¿½ ï¿½ï¿½Ù¿ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ ï¿½ï¿½)
     [Header("Optional")]
-    public MuzzleFlash MuzzleFlash;//¸ÓÁñ ÇÃ·¡½Ã ¿¬Ãâ ÄÄÆ÷³ÍÆ®
-    public CameraRecoil CameraRecoil;//Ä«¸Þ¶ó ¹Ýµ¿ ÄÄÆ÷³ÍÆ®
-    public ScreenShake ScreenShake;//È­¸é Áøµ¿ ÄÄÆ÷³ÍÆ®
+    public MuzzleFlash MuzzleFlash;//ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+    public CameraRecoil CameraRecoil;//Ä«ï¿½Þ¶ï¿½ ï¿½Ýµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+    public ScreenShake ScreenShake;//È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
-    private float _lastLocalFireTime;//¸¶Áö¸· ·ÎÄÃ ¹ß»ç ½Ã°£(¿¬Ãâ Áßº¹ ¹æÁö¿ë)
+    private float _lastLocalFireTime;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½Ã°ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
     void Update()
     {
-        bool pressed = Input.GetMouseButtonDown(0);//ÁÂÅ¬¸¯ 1È¸
+        bool pressed = Input.GetMouseButtonDown(0);//ï¿½ï¿½Å¬ï¿½ï¿½ 1È¸
         if (pressed)
         {
             TryFire();
@@ -29,12 +29,12 @@ public class InputSenderFire : MonoBehaviour
         float now = Time.time;
         if (now < _lastLocalFireTime + LocalFireCooldown)
         {
-            //ÄðÅ¸ÀÓ ´úÁö³µÀ¸¸é ¹ß»ç ½ÇÆÐ
+            //ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½
             return;
         }
         _lastLocalFireTime = now;
 
-        //¼­¹ö¿¡ FIRE Àü¼Û
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ FIRE ï¿½ï¿½ï¿½ï¿½
         if (NetworkRunner.instance != null)
         {
             NetworkRunner runner = NetworkRunner.instance;
@@ -47,19 +47,19 @@ public class InputSenderFire : MonoBehaviour
             }
             else if (isServer)
             {
-                //È£½ºÆ®Àü¿ë(Å¬¶óÀÌ¾ðÆ®°¡ ¾Æ´Ñ ¼­¹ö ´Üµ¶ Å×½ºÆ®ÀÎ °æ¿ì)
+                //È£ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½(Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Üµï¿½ ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½)
                 runner.ServerInjectCommand(0, "FIRE", "");
             }
         }
 
-        //·ÎÄÃ ¿¬Ãâ Ã³¸®
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
         if (MuzzleFlash != null)
         {
             MuzzleFlash.PlayOnce();
         }
         if (CameraRecoil != null)
         {
-            CameraRecoil.Kick(2.2f, 0.6f);//¹Ýµ¿ ¼¼±â ¿¹½Ã
+            CameraRecoil.Kick(2.2f, 0.6f);//ï¿½Ýµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
         if (ScreenShake != null)
         {

@@ -2,15 +2,15 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// ÀÏÁ¤ ½Ã°£ µ¿¾È ÁÖ±âÀûÀ¸·Î ¾Æ¹ÙÅ¸¸¦ Ã£´Ù°¡ ¹ß°ß Áï½Ã ¹ÙÀÎµù.
+/// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ¹ï¿½Å¸ï¿½ï¿½ Ã£ï¿½Ù°ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½.
 /// </summary>
 [DisallowMultipleComponent]
 public class FirstPersonAutoBindPolling : MonoBehaviour
 {
     public FirstPersonCameraRig rig;
     public LocalAvatarLocator locator;
-    public float timeoutSeconds = 5.0f;    // ÃÖ´ë ´ë±â ½Ã°£
-    public float intervalSeconds = 0.2f;   // Àç½Ãµµ °£°Ý
+    public float timeoutSeconds = 5.0f;    // ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
+    public float intervalSeconds = 0.2f;   // ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½
 
     private void Start()
     {
@@ -45,6 +45,6 @@ public class FirstPersonAutoBindPolling : MonoBehaviour
             elapsed = elapsed + intervalSeconds;
         }
 
-        Debug.LogWarning("FirstPersonAutoBindPolling: Å¸ÀÓ¾Æ¿ôÀ¸·Î ¹ÙÀÎµù ½ÇÆÐ.");
+        Debug.LogWarning("FirstPersonAutoBindPolling: Å¸ï¿½Ó¾Æ¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½.");
     }
 }

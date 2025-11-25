@@ -1,16 +1,17 @@
 using UnityEngine;
 
 /// <summary>
-/// ¼­¹ö±ÇÇÑÀ¸·Î HP °ü¸®
-///     °¨¼Ò/»ç¸Á ÀÌº¥Æ®¸¸ Á¦°ø
-///     ¼­¹ö¿¡¼­¸¸ TakeDamage È£Ãâ
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ HP ï¿½ï¿½ï¿½ï¿½
+///     ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+///     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ TakeDamage È£ï¿½ï¿½
 /// </summary>
 public class Damageable : MonoBehaviour
 {
     [Header("Stats")]
-    public int MaxHp = 100;//ÃÖ´ë Ã¼·Â
-    public int CurHp = 100;//ÇöÀç Ã¼·Â
+    public int MaxHp = 100;//ï¿½Ö´ï¿½ Ã¼ï¿½ï¿½
+    public int CurHp = 100;//ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½
 
+    public int Id = -1;
     public void ResetHp()
     {
         CurHp = MaxHp;
@@ -29,7 +30,9 @@ public class Damageable : MonoBehaviour
             CurHp = 0;
         }
 
-        if(CurHp == 0)
+        Debug.Log($"{(Id==0?"Host":"Client")} damaged {amount}, {CurHp}/{MaxHp}");
+
+        if (CurHp == 0)
         {
             OnDeath();
         }
@@ -37,7 +40,7 @@ public class Damageable : MonoBehaviour
 
     public void OnDeath()
     {
-        //¸®½ºÆù: ¼­¹ö¿¡¼­ Ã³¸®
-        //»ç¿îµå/ÀÌÆåÆ®: Å¬¶óÀÌ¾ðÆ®¿¡¼­ STATE ±âÁØ º°µµ ¿¬Ãâ Ã³¸®
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
+        //ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½Æ®: Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ STATE ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     }
 }

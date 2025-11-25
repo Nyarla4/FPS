@@ -82,10 +82,16 @@ public class ImpactDecalPool : MonoBehaviour
 
     private IEnumerator DespawnAfter(GameObject go, float seconds)
     {
+        var dmg = go.GetComponentInParent<Damageable>();
+
         float end = Time.time + seconds;//Despawns 시각
 
         while (Time.time < end)
         {
+            if (dmg.CurHp <= 0)
+            {//죽으면 즉시 제거
+                break;
+            }
             yield return null;
         }
         if (go != null)

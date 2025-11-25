@@ -18,6 +18,8 @@ public class ClientGame : MonoBehaviour
     private Dictionary<int, float> lastYawById = new Dictionary<int, float>();
     private Dictionary<int, float> lastPitchById = new Dictionary<int, float>();
 
+    private Dictionary<int, Damageable> clientDamageable = new();
+
     private void Awake()
     {
         avatars = new Dictionary<int, Transform>();
@@ -79,12 +81,14 @@ public class ClientGame : MonoBehaviour
             float y = 0.0f;
             float z = 0.0f;
             float yaw = 0.0f;
+            int hp = 0;
 
             int.TryParse(g[1].Value, out id);
             float.TryParse(g[2].Value, out x);
             float.TryParse(g[3].Value, out y);
             float.TryParse(g[4].Value, out z);
             float.TryParse(g[5].Value, out yaw);
+            int.TryParse(g[6].Value, out hp);
 
             Transform t = GetOrCreateAvatar(id);
             if (t == null)
@@ -99,6 +103,10 @@ public class ClientGame : MonoBehaviour
             // 예: p.id, p.yaw, p.pitch 를 파싱한 직후
             lastYawById[id] = yaw;
             lastPitchById[id] = 0;
+
+            var dmg = clientDamageable[id];
+            hp = Mathf.Clamp(hp, 0, dmg.MaxHp);
+            dmg.CurHp = hp;
         }
     }
 
@@ -129,8 +137,12 @@ public class ClientGame : MonoBehaviour
         else
         {
             GameObject go = GameObject.Instantiate(AvatarPrefab, AvatarsRoot);
+            Damageable dmg = go.GetComponent<Damageable>();
             go.name = $"Avatar_{id}";
             avatars.Add(id, go.transform);
+            clientDamageable.Add(id, dmg);
+            dmg.Id = id;
+            dmg.ResetHp();
 
             //루트 처리
             ServerGame sg = GetComponent<ServerGame>();

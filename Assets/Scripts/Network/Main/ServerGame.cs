@@ -1,3 +1,4 @@
+using AYellowpaper.SerializedCollections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,8 +16,7 @@ public class ServerGame : MonoBehaviour
     public Transform[] SpawnPoints;        // 스폰 위치 목록
 
     private float tickAccumulator;         // 틱 누적 시간
-    private Dictionary<int, PlayerSim> sims;  // 각 플레이어의 시뮬레이션 상태
-
+    private SerializedDictionary<int, PlayerSim> sims;  // 각 플레이어의 시뮬레이션 상태
     // 클라이언트가 보낸 최근 입력을 저장
     private class PendingInput
     {
@@ -26,6 +26,7 @@ public class ServerGame : MonoBehaviour
         public float pitch;    // 필요 시 사용
     }
 
+    [Serializable]
     private class PlayerSim
     {
         public int id;                 // 플레이어 ID
@@ -52,7 +53,7 @@ public class ServerGame : MonoBehaviour
 
     private void Awake()
     {
-        sims = new Dictionary<int, PlayerSim>();
+        sims = new ();
     }
 
     private void OnEnable()
@@ -311,9 +312,11 @@ public class ServerGame : MonoBehaviour
             if (dmg != null)
             {
                 dmg.TakeDamage(DamagePerShot);
+                sims[dmg.Id].hp = dmg.CurHp;
+                BroadcastState();
 
                 //죽은 경우 서버에서 리스폰 처리
-                if(dmg.CurHp == 0)
+                if (dmg.CurHp == 0)
                 {
                     Respawn(dmg.transform);
                 }
@@ -367,6 +370,10 @@ public class ServerGame : MonoBehaviour
                 sim.position = avatarRoot.position;
                 sim.yaw = 0.0f;
                 sim.pitch = 0.0f;
+                if (dmg != null)
+                {
+                    sim.hp = dmg.MaxHp;
+                }
             }
         }
 
