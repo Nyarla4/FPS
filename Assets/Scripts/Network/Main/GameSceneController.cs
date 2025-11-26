@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -17,6 +18,8 @@ public class GameSceneController : MonoBehaviour
     public Transform[] SpawnPoints;          // 서버 스폰 지점들
     public float ServerTickRate = 20.0f;     // 서버 틱 주기
     public float ServerMoveSpeed = 4.5f;     // 이동 속도
+
+    [SerializeField] private TMP_Text _broadcastText;
 
     private void Start()
     {
@@ -77,6 +80,10 @@ public class GameSceneController : MonoBehaviour
             cg.AvatarsRoot = AvatarsRoot;          // 보장된 참조 전달
             cg.AvatarPrefab = runtimeAvatarPrefab;  // 보장된 프리팹 전달
             cg.InitAvatarRoot();
+            if (_broadcastText != null)
+            {
+                cg.InitText(_broadcastText);
+            }
 
             // 로컬 입력 전송자(클라 조작용)
             InputSender input = gameObject.GetComponent<InputSender>();

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using TMPro;
+using System.Collections;
 
 /// <summary>
 /// 클라이언트에서 서버 STATE 메시지를 받아 캐릭터 위치/회전을 적용.
@@ -19,6 +21,9 @@ public class ClientGame : MonoBehaviour
     private Dictionary<int, float> lastPitchById = new Dictionary<int, float>();
 
     private Dictionary<int, Damageable> clientDamageable = new();
+
+    private TMP_Text _broadcastText;
+    private Coroutine _textRoutine;
 
     private void Awake()
     {
@@ -50,11 +55,25 @@ public class ClientGame : MonoBehaviour
         }
     }
 
+    public void InitText(TMP_Text text)
+    {
+        if (text != null)
+        {
+            _broadcastText = text;
+            _broadcastText.text = "";
+            _textRoutine = null;
+        }
+    }
+
     private void OnClientCommand(string cmd, string payload)
     {
         if (cmd == "STATE")
         {
             ApplyStateJson(payload);
+        }
+        else if (cmd == "HIT")
+        {
+            ApplyHitJson(payload);
         }
     }
 
@@ -63,6 +82,7 @@ public class ClientGame : MonoBehaviour
         // 아주 단순 파싱: 정규식으로 players 배열에서 id, x,y,z, yaw만 뽑는다.
         // (실전에서는 JSON 파서 사용 권장. 초보 강의라 의존성 줄이기 위해 간단 파싱)
         // 패턴 예: {"id":1,"x":0.0,"y":1.8,"z":2.0,"yaw":90,"hp":100}
+        //{players:[{"id":0,"x":1.0,"y":1.0,"z":1.0,"yaw":10,"hp":100},{"id":1,"x":1.000,"y":1.000,"z":1.000,"yaw":1.0,"hp":10}]}
         Regex item = new Regex("\\{\"id\":(\\d+),\"x\":([-0-9\\.]+),\"y\":([-0-9\\.]+),\"z\":([-0-9\\.]+),\"yaw\":([-0-9\\.]+),\"hp\":(\\d+)\\}",
                                RegexOptions.Compiled);
 
@@ -107,6 +127,38 @@ public class ClientGame : MonoBehaviour
             var dmg = clientDamageable[id];
             hp = Mathf.Clamp(hp, 0, dmg.MaxHp);
             dmg.CurHp = hp;
+        }
+    }
+    
+    private void ApplyHitJson(string json)
+    {
+        Debug.Log("hit_client");
+        // 아주 단순 파싱: 정규식으로 players 배열에서 id, x,y,z, yaw만 뽑는다.
+        // (실전에서는 JSON 파서 사용 권장. 초보 강의라 의존성 줄이기 위해 간단 파싱)
+        // 패턴 예:  {"id":1,"x":0.0,"y":1.8,"z":2.0,"yaw":90,"hp":100}
+        //{\"atk\":{0},\"def\":{1},\"hp\":{2}}
+        Regex item = new Regex("\\{\"atk\":(\\d+),\"def\":(\\d+),\"hp\":(\\d+)\\}",
+                               RegexOptions.Compiled);
+
+        MatchCollection matches = item.Matches(json);
+        if (matches == null)
+        {
+            return;
+        }
+
+        GroupCollection g = matches[0].Groups;
+
+        int atk = 0;
+        int def = 0;
+        int hp = 0;
+
+        int.TryParse(g[1].Value, out atk);
+        int.TryParse(g[2].Value, out def);
+        int.TryParse(g[3].Value, out hp);
+        
+        if (_broadcastText != null)
+        {
+            SetText($"{atk} attacked {def}, def is now {hp}", 3f);
         }
     }
 
@@ -173,5 +225,27 @@ public class ClientGame : MonoBehaviour
             ok = true;
         }
         return ok;
+    }
+
+    private void SetText(string value, float seconds)
+    {
+        if(_textRoutine != null || _broadcastText == null)
+        {
+            return;
+        }
+        _textRoutine = StartCoroutine(ShowText(value, seconds));
+    }
+
+    IEnumerator ShowText(string value, float seconds)
+    {
+        var timer = 0.0f;
+        _broadcastText.text = value;
+        while (timer < seconds)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        _broadcastText.text = "";
+        _textRoutine = null;
     }
 }

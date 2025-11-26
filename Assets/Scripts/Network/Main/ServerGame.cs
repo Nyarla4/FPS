@@ -312,7 +312,9 @@ public class ServerGame : MonoBehaviour
             if (dmg != null)
             {
                 dmg.TakeDamage(DamagePerShot);
-                sims[dmg.Id].hp = dmg.CurHp;
+                var def = sims[dmg.Id];
+                def.hp = dmg.CurHp;
+                BroadcastHit(sim.id, def.id, def.hp);
                 BroadcastState();
 
                 //죽은 경우 서버에서 리스폰 처리
@@ -394,5 +396,26 @@ public class ServerGame : MonoBehaviour
         }
 
         sim.Root = root;
+    }
+
+    private void BroadcastHit(int atkId, int defId, int defHp)
+    {
+        Debug.Log("hit_server");
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+        sb.Append("{\"players\":[");
+        {
+            sb.Append("{");
+            sb.AppendFormat("\"atk\":{0},\"def\":{1},\"hp\":{2}",
+                atkId, defId, defHp);
+            sb.Append("}");
+        }
+        sb.Append("]}");
+
+        string json = sb.ToString();
+        if (NetworkRunner.instance != null)
+        {
+            NetworkRunner.instance.ServerBroadcastLinePublic("HIT|" + json);
+        }
     }
 }
