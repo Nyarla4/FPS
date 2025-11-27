@@ -23,8 +23,9 @@ public class ChaseState : BaseState
 
     public override void OnEnter()
     {
-        //공격상태로의 전환을 준비
         //Chase 상태에서는 이동 시작
+        _context.Ops.SetStoppingDistance(1.2f);
+        _context.Ops.BeginChase(_context.Player);
     }
 
     public override void OnUpdate(float dt)
@@ -64,7 +65,8 @@ public class ChaseState : BaseState
         float distToLast = Vector3.Distance(_context.transform.position, _context.LastKnownPos);
         if (distToLast > _context.StoppingDistance)
         {
-            _context.MoveForward(_context.ChaseSpeed * speedMul, dt);
+            //_context.MoveForward(_context.ChaseSpeed * speedMul, dt);
+            bool keepChase = _context.Ops.ChaseUpdate(seen, _context.LastKnownPos);
         }
 
         //공격 사거리 진입 시 => Attack
@@ -115,5 +117,6 @@ public class ChaseState : BaseState
     public override void OnExit()
     {
         //상태 종료
+        _context.Ops.StopImmediate();
     }
 }

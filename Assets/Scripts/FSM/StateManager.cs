@@ -75,6 +75,9 @@ public class StateManager : MonoBehaviour
     [SerializeField] private Animator _animator;
 
     [SerializeField] private float _healed = 5f;
+
+    public NavAgentOps Ops;
+
     private void Awake()
     {
         if (_controller == null)
