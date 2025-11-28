@@ -21,6 +21,10 @@ public class NavAgentOps : MonoBehaviour
     {
         _loseTimer = 0.0f;//타이머 초기화
         _lastSeenPos = Vector3.zero;//마지막 시야 위치 초기화
+        if (_agent == null)
+        {
+            Debug.LogError("[NavAgentOps] agent 누락");
+        }
     }
 
     /// <summary>
@@ -33,6 +37,8 @@ public class NavAgentOps : MonoBehaviour
         {
             return;
         }
+
+        Debug.Log($"agent on navmesh {_agent.isOnNavMesh}");
 
         Transform p = _patrol.GetCurrent();//현재 웨이 포인트
         if (p != null)
@@ -78,6 +84,17 @@ public class NavAgentOps : MonoBehaviour
         if (target != null)
         {
             Player = target;//추격 대상 설정
+        }
+
+        NavMeshHit hit;
+        if (!_agent.isOnNavMesh)
+        {
+            Debug.Log("!onNavMesh");
+            if(NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
+            {
+                Debug.Log($"warp to {hit.position}");
+                _agent.Warp(hit.position);
+            }
         }
 
         _loseTimer = 0.0f;
