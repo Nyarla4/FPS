@@ -60,7 +60,7 @@ public class ChaseState : BaseState
         }
 
         //위치를 향해 회전
-        _context.FacePosition(_context.LastKnownPos, dt);
+        //_context.FacePosition(_context.LastKnownPos, dt);
 
         float distToLast = Vector3.Distance(_context.transform.position, _context.LastKnownPos);
         if (distToLast > _context.StoppingDistance)
