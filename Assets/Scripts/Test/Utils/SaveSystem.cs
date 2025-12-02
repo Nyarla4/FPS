@@ -117,10 +117,19 @@ public static class SaveSystem
 
     public static void SaveLastClearStage(int value)
     {
-        IniFile.WriteFile(_settingFolderPath, _settingFilePath, _stageSection, _stageKey, value.ToString());
+        var preValue = IniFile.ReadFile(_settingFolderPath, _settingFilePath, _stageSection, _stageKey);
+        if (int.TryParse(preValue, out var cleared))
+        {
+            var saveValue = Mathf.Max(cleared, value);
+            IniFile.WriteFile(_settingFolderPath, _settingFilePath, _stageSection, _stageKey, saveValue.ToString());
+        }
+        else
+        {
+            IniFile.WriteFile(_settingFolderPath, _settingFilePath, _stageSection, _stageKey, value.ToString());
+        }
     }
 
-    public static bool CheckStageCleared(int stage)
+    public static bool CheckStageAble(int stage)
     {
         if(stage == 1)
         {

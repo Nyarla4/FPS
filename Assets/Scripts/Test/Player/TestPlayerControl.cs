@@ -5,16 +5,15 @@ using UnityEngine.InputSystem;
 public class TestPlayerControl : MonoBehaviour
 {
     [SerializeField] private CharacterController _cc;
-    [SerializeField] private GunKind_SO _gun;
-
+    
     private Vector2 _moveInput;
-    private bool _sprintHeld;//ÁúÁÖ ¹öÆ° ´­·È´ÂÁö ¿©ºÎ
+    private bool _sprintHeld;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½È´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public bool SprintHeld => _sprintHeld;
     private float _currentSpeed;
     private Vector3 _velocity;
 
-    private float _lastGroundedTime;//¸¶Áö¸· ÂøÁö½Ã°¢
-    private float _lastJumpPressTime;//¸¶Áö¸· Á¡ÇÁÀÔ·Â½Ã°¢
+    private float _lastGroundedTime;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ã°ï¿½
+    private float _lastJumpPressTime;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô·Â½Ã°ï¿½
 
     [SerializeField] private float _moveSpeed;
 
@@ -30,21 +29,16 @@ public class TestPlayerControl : MonoBehaviour
     {
         float dt = Time.deltaTime;
 
-        //Èñ¸Á ¹æÇâ
+        //ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Vector3 wish = transform.forward * _moveInput.y + transform.right * _moveInput.x;
 
-        //Á¤±ÔÈ­
+        //ï¿½ï¿½ï¿½ï¿½È­
         if (wish.sqrMagnitude > 1.0f)
         {
             wish.Normalize();
         }
 
         _cc.Move(wish * dt * _moveSpeed);
-    }
-
-    public void GetMagazine(int ammo)
-    {
-        _gun.ReserveAmmo += ammo;
     }
 
     #region InputAction

@@ -14,23 +14,32 @@ public class TestEnemyHealth : MonoBehaviour, IDamageable
     public float Health
     {
         get { return _health; }
-        private set { 
+        private set {
             _health = value;
             _hpBar.value = _health;
             if (_health <= 0)
             {
                 OnDeath?.Invoke();
+                Destroy(gameObject);
             }
         }
     }
 
     public Action OnDeath;
 
+    [SerializeField] TestEnemyCore _core;
+
     public void ApplyDamage(float amount, Vector3 hitPoint, Vector3 hitNormal, Transform source)
     {
         _showTimer = 5f;
         _hpBar.gameObject.SetActive(true);
         Health -= amount;
+
+        if (_core.Target == null)
+        {
+            var player = FindObjectsByType<TestPlayerControl>(FindObjectsSortMode.None)[0];
+            _core.Target = player.transform;
+        }
     }
 
     private void Awake()
@@ -45,6 +54,14 @@ public class TestEnemyHealth : MonoBehaviour, IDamageable
 
     void Update()
     {
+        if (_hpBar.gameObject.activeInHierarchy)
+        {
+            var camTransform = Camera.main.transform;
+            var rot = _hpBar.transform.position + (camTransform.rotation * Vector3.forward);
+            //rot.y = 0f;
+            _hpBar.transform.LookAt(rot,Vector3.up);
+        }
+
         if (_showTimer > 0)
         {
             _showTimer -= Time.deltaTime;

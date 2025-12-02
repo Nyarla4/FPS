@@ -15,7 +15,7 @@ public class StageSelectButton : MonoBehaviour
     {
         _button = GetComponent<Button>();
         _stageText.color = Color.red;
-        bool able = SaveSystem.CheckStageCleared(_currentStage);
+        bool able = SaveSystem.CheckStageAble(_currentStage);
         _button.interactable = able;
         if (able)
         {

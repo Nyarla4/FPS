@@ -16,6 +16,11 @@ public class ClearLogics : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        Check();
+    }
+
     public void AddEnemy(TestEnemyCore enemy)
     {
         _enemies.Add(enemy);

@@ -118,6 +118,12 @@ public class ProjectileBullet : MonoBehaviour
         //데미지 계산
         float finalDamage = Damage;
 
+        if(hit.collider.TryGetComponent<ClearObject>(out var clear))
+        {
+            clear.Clear();
+            return;
+        }
+
         if (hit.collider.TryGetComponent<Hitbox>(out Hitbox hb))
         {//hitBox에 데미지배수 적용
             finalDamage *= hb.DamageMultiplier;

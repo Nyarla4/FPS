@@ -7,7 +7,7 @@ public class TestLobbyUI : MonoBehaviour
     [SerializeField] TMP_Text _celebrateText;
     void Start()
     {
-        if (SaveSystem.CheckStageCleared(3))
+        if (SaveSystem.CheckStageAble(4))
         {
             if (_celebrateText != null)
             {

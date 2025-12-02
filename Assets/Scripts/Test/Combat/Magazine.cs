@@ -6,9 +6,10 @@ public class Magazine : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if(other.TryGetComponent<TestPlayerControl>(out var player))
+        if(other.TryGetComponent<TestWeaponControl>(out var player))
         {
             player.GetMagazine(_ammos);
+            player.UpdateHud();
             Destroy(gameObject);
         }
     }
