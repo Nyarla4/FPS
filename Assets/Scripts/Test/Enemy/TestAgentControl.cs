@@ -9,4 +9,10 @@ public class TestAgentControl : MonoBehaviour
     {
         _agent.SetDestination(goal);
     }
+
+    public void Stop()
+    {
+        _agent.isStopped = true;
+        _agent.ResetPath();
+    }
 }

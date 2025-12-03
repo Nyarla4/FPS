@@ -9,14 +9,16 @@ public class TestPlayerControl : MonoBehaviour
     private Vector2 _moveInput;
     private bool _sprintHeld;//���� ��ư ���ȴ��� ����
     public bool SprintHeld => _sprintHeld;
-    private float _currentSpeed;
-    private Vector3 _velocity;
-
-    private float _lastGroundedTime;//������ �����ð�
-    private float _lastJumpPressTime;//������ �����Է½ð�
+    //private float _currentSpeed;
+    //private Vector3 _velocity;
+    
+    //private float _lastGroundedTime;//������ �����ð�
+    private float _lastJumpPressTime;//최종 점프 누른 시각
 
     [SerializeField] private float _moveSpeed;
+    [SerializeField] private PlayerHealth _health;
 
+    [SerializeField] private Animator _animator;
     private void Awake()
     {
         if (_cc == null)
@@ -37,6 +39,7 @@ public class TestPlayerControl : MonoBehaviour
         {
             wish.Normalize();
         }
+        _animator.SetFloat("Speed", wish.sqrMagnitude);
 
         _cc.Move(wish * dt * _moveSpeed);
     }

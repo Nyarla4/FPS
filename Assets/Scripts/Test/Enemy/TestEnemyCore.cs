@@ -29,6 +29,10 @@ public class TestEnemyCore : MonoBehaviour
     public LayerMask VisionMask; //시야 레이캐스트 충돌 마스크(벽, 지형, 플레이어 등)
 
     [SerializeField] private float _attackDist;
+    private float _attackTimer;
+    [SerializeField] private float _attackDamage;
+    [SerializeField] private float _attackCooldown;
+    private float _rotateSpeed = 50f;
 
     private void Awake()
     {
@@ -178,16 +182,29 @@ public class TestEnemyCore : MonoBehaviour
     public void OnAttackEnter()
     {
         //공격 관련 함수 초기화 처리
+        _agent.Stop();
+        _attackTimer = 0.0f;
     }
 
     public void Attack()
     {
+        var dt = Time.deltaTime;
+
         if (Vector3.Distance(transform.position, Target.position) > _attackDist)
         {
             StateChange(FSM.chase);
             return;
         }
 
+        _attackTimer -= dt;
+
+        if (_attackTimer <= 0.0f)
+        {
+            DoAttack();
+            _attackTimer = _attackCooldown;
+        }
+
+        FacePosition(Target.position, dt);
     }
 
     public void OnAttackExit()
@@ -231,6 +248,8 @@ public class TestEnemyCore : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, ViewDistance, VisionMask, QueryTriggerInteraction.Ignore))
         {
+            Debug.DrawLine(Eye.position, hit.point, Color.green);
+
             //충돌한 오브젝트의 루트가 타겟 루트와 같다면 시야 내 존재
             Transform h = hit.collider.transform;
             if (IsSameRoot(h, player))
@@ -242,10 +261,9 @@ public class TestEnemyCore : MonoBehaviour
                         return;
                     }
                 }
+                Target = player;
             }
         }
-
-        Target = player;
     }
 
     private bool IsSameRoot(Transform a, Transform b)
@@ -256,5 +274,39 @@ public class TestEnemyCore : MonoBehaviour
         }
 
         return a.root == b.root;
+    }
+
+    private void DoAttack()
+    {
+        if (Target == null)
+        {
+            return;
+        }
+
+        IDamageable id = Target.GetComponent<IDamageable>();
+        if (id == null)
+        {
+            return;
+        }
+
+        Vector3 hp = Target.position; //히트 위치(예시용)
+        Vector3 n = Vector3.up; //노멀(방향)
+
+        id.ApplyDamage(_attackDamage, hp, n, transform);
+    }
+
+    private void FacePosition(Vector3 target, float dt)
+    {
+        Vector3 flatTarget = target;
+        flatTarget.y = transform.position.y;
+
+        Vector3 to = flatTarget - transform.position;//지면 기준 벡터
+        to.y = 0.0f;
+
+        if (to.sqrMagnitude > 0.0001f)
+        {
+            Quaternion look = Quaternion.LookRotation(to.normalized, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look, dt * _rotateSpeed);
+        }
     }
 }

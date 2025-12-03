@@ -34,7 +34,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public void ApplyDamage(float amount, Vector3 hitPoint, Vector3 hitNormal, Transform source)
     {
         float damage = Mathf.Max(amount, 0);
-        Debug.Log($"player attacked {damage} damage");
+        //Debug.Log($"player attacked {damage} damage");
 
         _currentHealth -= damage;
 
