@@ -19,6 +19,7 @@ public class TestPlayerControl : MonoBehaviour
     [SerializeField] private PlayerHealth _health;
 
     [SerializeField] private Animator _animator;
+    [SerializeField] private TestDeadUI _onDeadUI;
     private void Awake()
     {
         if (_cc == null)
@@ -27,8 +28,22 @@ public class TestPlayerControl : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (_onDeadUI != null)
+        {
+            _onDeadUI.ClosePanel();
+        }
+        _health.OnDeath.AddListener(OnDeath);
+    }
+
     void Update()
     {
+        if (_health.CurrentHealth <= 0f)
+        {
+            return;
+        }
+
         float dt = Time.deltaTime;
 
         //��� ����
@@ -74,4 +89,17 @@ public class TestPlayerControl : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnDeath()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 0;
+
+        if (_onDeadUI != null)
+        {
+            _onDeadUI.OpenPanel();
+        }
+    }
 }

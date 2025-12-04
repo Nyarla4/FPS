@@ -34,6 +34,8 @@ public class TestEnemyCore : MonoBehaviour
     [SerializeField] private float _attackCooldown;
     private float _rotateSpeed = 50f;
 
+    [SerializeField] private Animator _animator;
+
     private void Awake()
     {
         _agent = GetComponent<TestAgentControl>();
@@ -108,6 +110,11 @@ public class TestEnemyCore : MonoBehaviour
 
     public void OnPatrolEnter()
     {
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", 1);
+        }
+
         int firstIndex = -1;
         float firstDist = float.PositiveInfinity;
         for (int i = 0; i < _patrolPoints.Length; i++)
@@ -161,7 +168,10 @@ public class TestEnemyCore : MonoBehaviour
 
     public void OnChaseEnter()
     {
-        
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", 1);
+        }
     }
 
     public void Chase()
@@ -181,6 +191,11 @@ public class TestEnemyCore : MonoBehaviour
 
     public void OnAttackEnter()
     {
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", 0);
+        }
+
         //공격 관련 함수 초기화 처리
         _agent.Stop();
         _attackTimer = 0.0f;
@@ -248,12 +263,13 @@ public class TestEnemyCore : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, ViewDistance, VisionMask, QueryTriggerInteraction.Ignore))
         {
-            Debug.DrawLine(Eye.position, hit.point, Color.green);
+            Debug.DrawLine(Eye.position, hit.point, Color.yellow);
 
             //충돌한 오브젝트의 루트가 타겟 루트와 같다면 시야 내 존재
             Transform h = hit.collider.transform;
             if (IsSameRoot(h, player))
             {
+                Debug.DrawLine(Eye.position, hit.point, Color.green);
                 if (h.root.TryGetComponent<PlayerHealth>(out var hp))
                 {//죽었으면 못찾은걸로 처리
                     if (hp.CurrentHealth <= 0)
